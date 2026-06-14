@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TimeTravel Agency — Voyages temporels de luxe</title>
+  <meta name="description" content="TimeTravel Agency — agence (fictive) de voyage temporel de luxe. Réservez votre traversée vers Paris 1889, le Crétacé ou Florence 1504, guidé par Chronos, notre concierge IA.">
+  <meta name="theme-color" content="#0B0908">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TimeTravel Agency">
+  <meta property="og:title" content="TimeTravel Agency — Voyages temporels de luxe">
+  <meta property="og:description" content="Trois époques. Un départ. Des souvenirs vieux de plusieurs siècles — ou de soixante-cinq millions d'années.">
+  <!-- og:image : remplacer par une URL ABSOLUE après déploiement (ex. https://votre-site/assets/img/florence-hero.jpg) -->
+  <meta property="og:image" content="assets/img/florence-hero.jpg">
+  <meta property="og:image:alt" content="TimeTravel Agency — voyages temporels de luxe">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TimeTravel Agency — Voyages temporels de luxe">
+  <meta name="twitter:description" content="Trois époques. Un départ. Des souvenirs vieux de plusieurs siècles — ou de soixante-cinq millions d'années.">
+  <meta name="twitter:image" content="assets/img/florence-hero.jpg">
+
+  <!-- Favicon : ⧗ or sur fond noir, inline (aucune requête réseau) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230B0908'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='22' text-anchor='middle' fill='%23C8A75C'%3E%E2%A7%97%3C/text%3E%3C/svg%3E">
+
+  <!-- Polices -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+
+  <!-- Scripts (defer = exécution dans l'ordre, après le parsing du DOM) -->
+  <script defer src="js/data.js"></script>
+  <script defer src="js/ai.js"></script>
+  <script defer src="js/chat.js"></script>
+  <script defer src="js/quiz.js"></script>
+  <script defer src="js/itinerary.js"></script>
+  <script defer src="js/booking.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Aller au contenu</a>
+
+  <!-- ===== SAUT TEMPOREL (overlay) ===== -->
+  <div class="jump-overlay" id="jump-overlay" aria-hidden="true" hidden>
+    <div class="jump-overlay__ring"></div>
+    <div class="jump-overlay__ring jump-overlay__ring--2"></div>
+    <div class="jump-overlay__label" role="status" aria-live="polite">Translation temporelle en cours</div>
+    <div class="jump-overlay__counter" id="jump-counter">2026</div>
+    <div class="jump-overlay__dots">
+      <span class="blink-dot"></span><span class="blink-dot"></span><span class="blink-dot"></span>
+    </div>
+  </div>
+
+  <!-- ===== HEADER / HUD ===== -->
+  <header class="site-header" id="site-header">
+    <button class="brand" data-action="go" data-target="home" aria-label="TimeTravel Agency — accueil">
+      <span class="brand__glyph" aria-hidden="true">⧗</span>
+      <span class="brand__name">TimeTravel <em>Agency</em></span>
+    </button>
+
+    <nav class="main-nav" aria-label="Navigation principale">
+      <button class="nav-link" data-action="go" data-target="paris" data-nav="paris">Paris 1889</button>
+      <button class="nav-link" data-action="go" data-target="cretace" data-nav="cretace">Crétacé</button>
+      <button class="nav-link" data-action="go" data-target="florence" data-nav="florence">Florence 1504</button>
+      <button class="nav-cta" data-action="go" data-target="reserver" data-nav="reserver">Réserver</button>
+      <div class="hud" aria-label="Époque courante">
+        <span class="hud__dot" aria-hidden="true"></span>
+        <span class="hud__label">Époque</span>
+        <span class="hud__year" id="hud-year">2026</span>
+      </div>
+    </nav>
+
+    <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <!-- Menu mobile -->
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Navigation mobile" hidden>
+    <button class="nav-link" data-action="go" data-target="paris" data-nav="paris">Paris 1889</button>
+    <button class="nav-link" data-action="go" data-target="cretace" data-nav="cretace">Crétacé</button>
+    <button class="nav-link" data-action="go" data-target="florence" data-nav="florence">Florence 1504</button>
+    <button class="nav-cta" data-action="go" data-target="reserver" data-nav="reserver">Réserver</button>
+    <div class="hud">
+      <span class="hud__dot" aria-hidden="true"></span>
+      <span class="hud__label">Époque</span>
+      <span class="hud__year" data-hud-year>2026</span>
+    </div>
+  </nav>
+
+  <main id="main">
+
+    <!-- ===== ACCUEIL ===== -->
+    <section class="view" data-view="home" aria-label="Accueil">
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero__conic" aria-hidden="true"></div>
+        <div class="hero__glow" aria-hidden="true"></div>
+        <div class="hero__ring hero__ring--1" aria-hidden="true"></div>
+        <div class="hero__ring hero__ring--2" aria-hidden="true"></div>
+        <div class="hero__ring hero__ring--3" aria-hidden="true"></div>
+        <div class="hero__content">
+          <div class="eyebrow hero__eyebrow">Agence de voyage temporel — Terminal de Paris, 2026</div>
+          <h1 class="hero__title">Le temps n'est plus<br><em>une frontière.</em></h1>
+          <p class="hero__sub">Trois époques. Un départ. Des souvenirs vieux de plusieurs siècles — ou de soixante-cinq millions d'années.</p>
+          <div class="hero__ctas">
+            <button class="btn btn--gold" data-action="scroll-dests">Découvrir les époques</button>
+            <button class="btn btn--ghost" data-action="open-quiz">Trouver mon époque</button>
+          </div>
+        </div>
+        <div class="hero__scroll-hint" aria-hidden="true">Défiler</div>
+      </section>
+
+      <!-- Piliers -->
+      <section class="pillars container" aria-label="L'agence">
+        <div class="pillar reveal">
+          <div class="pillar__num">01</div>
+          <div class="pillar__title">Sécurité paradoxale</div>
+          <p class="pillar__text">Champ de stase certifié, protocole strict de non-interférence : votre passage ne laisse aucune trace dans la ligne temporelle.</p>
+        </div>
+        <div class="pillar reveal" style="--reveal-delay:.12s">
+          <div class="pillar__num">02</div>
+          <div class="pillar__title">Immersion totale</div>
+          <p class="pillar__text">Garde-robe, monnaie et usages d'époque fournis avant le départ. Vous ne visitez pas le passé : vous y vivez.</p>
+        </div>
+        <div class="pillar reveal" style="--reveal-delay:.24s">
+          <div class="pillar__num">03</div>
+          <div class="pillar__title">Conciergerie chrononaute</div>
+          <p class="pillar__text">Un guide expert vous accompagne à chaque instant — et Chronos, notre concierge IA, répond à vos questions avant le départ.</p>
+        </div>
+      </section>
+
+      <!-- Destinations -->
+      <section class="dests container" id="tt-destinations" aria-label="Destinations">
+        <div class="dests__head">
+          <h2 class="section-title">Trois époques au départ</h2>
+          <div class="dests__season">Saison 2026</div>
+        </div>
+        <div class="dests__grid">
+          <a class="dest-card reveal" href="#/paris" aria-label="Découvrir Paris 1889">
+            <figure class="media media--card" data-dest="paris" data-img="paris-card" data-label="Visuel — Paris 1889">
+              <img alt="Paris 1889, la Belle Époque" loading="lazy" decoding="async">
+            </figure>
+            <div class="dest-card__body">
+              <div class="dest-card__year">1889</div>
+              <div class="dest-card__title">Paris, Belle Époque</div>
+              <p class="dest-card__teaser">L'Exposition Universelle, la tour toute neuve de M. Eiffel et le Tout-Paris en habit de soirée.</p>
+              <div class="dest-card__more">Explorer →</div>
+            </div>
+          </a>
+          <a class="dest-card reveal" href="#/cretace" aria-label="Découvrir le Crétacé" style="--reveal-delay:.12s">
+            <figure class="media media--card" data-dest="cretace" data-img="cretace-card" data-label="Visuel — Crétacé">
+              <img alt="Le Crétacé, nature préhistorique" loading="lazy" decoding="async">
+            </figure>
+            <div class="dest-card__body">
+              <div class="dest-card__year">−65 000 000</div>
+              <div class="dest-card__title">Le Crétacé</div>
+              <p class="dest-card__teaser">Les derniers géants de la Terre, observés depuis nos plateformes de stase. Le safari ultime.</p>
+              <div class="dest-card__more">Explorer →</div>
+            </div>
+          </a>
+          <a class="dest-card reveal" href="#/florence" aria-label="Découvrir Florence 1504" style="--reveal-delay:.24s">
+            <figure class="media media--card" data-dest="florence" data-img="florence-card" data-label="Visuel — Florence 1504">
+              <img alt="Florence 1504, la Renaissance" loading="lazy" decoding="async">
+            </figure>
+            <div class="dest-card__body">
+              <div class="dest-card__year">1504</div>
+              <div class="dest-card__title">Florence, Renaissance</div>
+              <p class="dest-card__teaser">Le David vient d'être dévoilé, Léonard remplit ses carnets, la ville entière bruisse de génie.</p>
+              <div class="dest-card__more">Explorer →</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Bande quiz -->
+      <section class="quiz-band" aria-label="L'oracle de Chronos">
+        <div class="quiz-band__inner reveal">
+          <div class="quiz-band__glyph" aria-hidden="true">⧗</div>
+          <h2 class="quiz-band__title">Indécis face à l'éternité ?</h2>
+          <p class="quiz-band__text">Quatre questions. L'oracle de Chronos analyse vos réponses et compose une recommandation rien que pour vous.</p>
+          <button class="btn btn--ghost btn--ghost-fill" data-action="open-quiz">Consulter l'oracle</button>
+        </div>
+      </section>
+    </section>
+
+    <!-- ===== PARIS 1889 ===== -->
+    <section class="view" data-view="paris" aria-label="Paris 1889" hidden>
+      <section class="dest-hero">
+        <figure class="media" data-dest="paris" data-img="paris-hero" data-label="Visuel Session 1 — Paris 1889">
+          <img alt="Paris 1889 — l'Exposition Universelle" loading="lazy" decoding="async">
+        </figure>
+        <div class="dest-hero__scrim" aria-hidden="true"></div>
+        <div class="dest-hero__content">
+          <div class="dest-hero__inner container">
+            <div class="dest-hero__year">1889</div>
+            <h1 class="dest-hero__title">Paris, Belle Époque</h1>
+            <p class="dest-hero__tagline">La Ville Lumière à l'heure de tous les possibles.</p>
+          </div>
+        </div>
+      </section>
+      <section class="meta-bar">
+        <dl class="meta-bar__grid container">
+          <div class="meta-item"><dt>Époque</dt><dd>Mai 1889</dd></div>
+          <div class="meta-item"><dt>Durée</dt><dd>4 jours</dd></div>
+          <div class="meta-item"><dt>À partir de</dt><dd>12 400 € / pers.</dd></div>
+          <div class="meta-item"><dt>Risque paradoxal</dt><dd>Faible</dd></div>
+        </dl>
+      </section>
+      <section class="dest-intro">
+        <p class="reveal">Mai 1889. L'Exposition Universelle bat son plein, la tour de M. Eiffel vient d'ouvrir ses ascenseurs au public, et le Tout-Paris hésite encore entre scandale et émerveillement. Vous arrivez en habit de soirée, par la porte de service de l'Histoire.</p>
+      </section>
+      <section class="activities container">
+        <div class="activity-card reveal">
+          <div class="activity-card__num">I</div>
+          <div class="activity-card__title">L'inauguration de la Tour</div>
+          <p class="activity-card__text">Gravissez les 1 710 marches avant la foule. Champagne au premier étage, Paris à vos pieds au coucher du soleil.</p>
+        </div>
+        <div class="activity-card reveal" style="--reveal-delay:.12s">
+          <div class="activity-card__num">II</div>
+          <div class="activity-card__title">La Galerie des Machines</div>
+          <p class="activity-card__text">Trois cents mètres de verre et d'acier : le futur tel qu'on le rêvait en 1889, dans un vacarme de pistons et d'applaudissements.</p>
+        </div>
+        <div class="activity-card reveal" style="--reveal-delay:.24s">
+          <div class="activity-card__num">III</div>
+          <div class="activity-card__title">Une soirée au cabaret</div>
+          <p class="activity-card__text">Cancan, conversations avec le Tout-Paris et absinthe — avec modération temporelle, le protocole y veille.</p>
+        </div>
+      </section>
+      <section class="itin-wrap">
+        <div class="itin-panel reveal">
+          <div class="itin-panel__eyebrow">Composé par Chronos · IA</div>
+          <h3 class="itin-panel__title">Votre itinéraire sur mesure</h3>
+          <p class="itin-panel__sub">Choisissez vos envies, notre concierge IA compose vos 4 jours en 1889.</p>
+          <div class="chips" data-chips="paris" role="group" aria-label="Centres d'intérêt — Paris 1889"></div>
+          <button class="btn btn--accent" data-action="gen-itin" data-dest="paris">Composer mon itinéraire</button>
+          <div class="itin-busy" data-busy="paris" hidden><span class="itin-busy__glyph" aria-hidden="true">⧗</span> Chronos consulte les archives de 1889…</div>
+          <div class="itin-output" data-output="paris" aria-live="polite" hidden></div>
+        </div>
+      </section>
+      <section class="dest-cta">
+        <div class="dest-cta__inner container">
+          <button class="btn btn--gold btn--lg" data-action="go-reserver" data-dest="paris">Réserver Paris 1889</button>
+          <button class="btn-link" data-action="go" data-target="cretace">Époque suivante · Crétacé →</button>
+        </div>
+      </section>
+    </section>
+
+    <!-- ===== CRÉTACÉ ===== -->
+    <section class="view" data-view="cretace" aria-label="Le Crétacé" hidden>
+      <section class="dest-hero">
+        <figure class="media" data-dest="cretace" data-img="cretace-hero" data-label="Visuel Session 1 — Crétacé">
+          <img alt="Le Crétacé — nature préhistorique" loading="lazy" decoding="async">
+        </figure>
+        <div class="dest-hero__scrim" aria-hidden="true"></div>
+        <div class="dest-hero__content">
+          <div class="dest-hero__inner container">
+            <div class="dest-hero__year dest-hero__year--long">−65 000 000</div>
+            <h1 class="dest-hero__title">Le Crétacé</h1>
+            <p class="dest-hero__tagline">Soixante-cinq millions d'années avant la première empreinte humaine.</p>
+          </div>
+        </div>
+      </section>
+      <section class="meta-bar">
+        <dl class="meta-bar__grid container">
+          <div class="meta-item"><dt>Époque</dt><dd>Maastrichtien</dd></div>
+          <div class="meta-item"><dt>Durée</dt><dd>3 jours</dd></div>
+          <div class="meta-item"><dt>À partir de</dt><dd>24 800 € / pers.</dd></div>
+          <div class="meta-item"><dt>Risque paradoxal</dt><dd>Élevé · escorte de stase</dd></div>
+        </dl>
+      </section>
+      <section class="dest-intro">
+        <p class="reveal">L'air est plus dense, la lumière plus crue, le monde immensément plus vaste. Aucune route, aucun témoin : seulement les derniers géants de la Terre, observés depuis nos plateformes de stase. Le safari ultime — trois jours au bord de la fin d'un monde.</p>
+      </section>
+      <section class="activities container">
+        <div class="activity-card reveal">
+          <div class="activity-card__num">I</div>
+          <div class="activity-card__title">L'aube des géants</div>
+          <p class="activity-card__text">Depuis la plateforme d'observation, un troupeau d'alamosaures traverse la plaine dans la brume du matin.</p>
+        </div>
+        <div class="activity-card reveal" style="--reveal-delay:.12s">
+          <div class="activity-card__num">II</div>
+          <div class="activity-card__title">L'affût du tyran</div>
+          <p class="activity-card__text">À distance respectueuse — quatre cents mètres et un champ de stase — observez le Tyrannosaurus rex en chasse.</p>
+        </div>
+        <div class="activity-card reveal" style="--reveal-delay:.24s">
+          <div class="activity-card__num">III</div>
+          <div class="activity-card__title">Nuit primitive</div>
+          <p class="activity-card__text">Un ciel sans aucune lumière humaine. La Voie lactée telle que personne ne la reverra jamais.</p>
+        </div>
+      </section>
+      <section class="itin-wrap">
+        <div class="itin-panel reveal">
+          <div class="itin-panel__eyebrow">Composé par Chronos · IA</div>
+          <h3 class="itin-panel__title">Votre expédition sur mesure</h3>
+          <p class="itin-panel__sub">Choisissez vos envies, notre concierge IA compose vos 3 jours au Crétacé.</p>
+          <div class="chips" data-chips="cretace" role="group" aria-label="Centres d'intérêt — Crétacé"></div>
+          <button class="btn btn--accent" data-action="gen-itin" data-dest="cretace">Composer mon expédition</button>
+          <div class="itin-busy" data-busy="cretace" hidden><span class="itin-busy__glyph" aria-hidden="true">⧗</span> Chronos étudie les relevés du Maastrichtien…</div>
+          <div class="itin-output" data-output="cretace" aria-live="polite" hidden></div>
+        </div>
+      </section>
+      <section class="dest-cta">
+        <div class="dest-cta__inner container">
+          <button class="btn btn--gold btn--lg" data-action="go-reserver" data-dest="cretace">Réserver le Crétacé</button>
+          <button class="btn-link" data-action="go" data-target="florence">Époque suivante · Florence 1504 →</button>
+        </div>
+      </section>
+    </section>
+
+    <!-- ===== FLORENCE 1504 ===== -->
+    <section class="view" data-view="florence" aria-label="Florence 1504" hidden>
+      <section class="dest-hero">
+        <figure class="media" data-dest="florence" data-img="florence-hero" data-label="Visuel Session 1 — Florence 1504">
+          <img alt="Florence 1504 — la Renaissance" loading="lazy" decoding="async">
+        </figure>
+        <div class="dest-hero__scrim" aria-hidden="true"></div>
+        <div class="dest-hero__content">
+          <div class="dest-hero__inner container">
+            <div class="dest-hero__year">1504</div>
+            <h1 class="dest-hero__title">Florence, Renaissance</h1>
+            <p class="dest-hero__tagline">La Renaissance, à l'instant exact où elle bascule dans la légende.</p>
+          </div>
+        </div>
+      </section>
+      <section class="meta-bar">
+        <dl class="meta-bar__grid container">
+          <div class="meta-item"><dt>Époque</dt><dd>Septembre 1504</dd></div>
+          <div class="meta-item"><dt>Durée</dt><dd>4 jours</dd></div>
+          <div class="meta-item"><dt>À partir de</dt><dd>14 900 € / pers.</dd></div>
+          <div class="meta-item"><dt>Risque paradoxal</dt><dd>Modéré</dd></div>
+        </dl>
+      </section>
+      <section class="dest-intro">
+        <p class="reveal">Septembre 1504. Le David vient d'être hissé devant le Palazzo Vecchio, Léonard remplit ses carnets et toute la ville bruisse de génie et d'intrigues. Vous arrivez en étoffes toscanes, lettre d'introduction des Médicis en poche.</p>
+      </section>
+      <section class="activities container">
+        <div class="activity-card reveal">
+          <div class="activity-card__num">I</div>
+          <div class="activity-card__title">Le dévoilement du David</div>
+          <p class="activity-card__text">Place de la Seigneurie, la foule retient son souffle devant le colosse de marbre de Michel-Ange.</p>
+        </div>
+        <div class="activity-card reveal" style="--reveal-delay:.12s">
+          <div class="activity-card__num">II</div>
+          <div class="activity-card__title">L'atelier de Léonard</div>
+          <p class="activity-card__text">Pigments, carnets et machines volantes : une visite privée, sous strictes conditions de non-interférence.</p>
+        </div>
+        <div class="activity-card reveal" style="--reveal-delay:.24s">
+          <div class="activity-card__num">III</div>
+          <div class="activity-card__title">Banquet chez les Médicis</div>
+          <p class="activity-card__text">Vins toscans, musique et intrigues de cour — dans les règles de l'art, et de la discrétion.</p>
+        </div>
+      </section>
+      <section class="itin-wrap">
+        <div class="itin-panel reveal">
+          <div class="itin-panel__eyebrow">Composé par Chronos · IA</div>
+          <h3 class="itin-panel__title">Votre séjour sur mesure</h3>
+          <p class="itin-panel__sub">Choisissez vos envies, notre concierge IA compose vos 4 jours en 1504.</p>
+          <div class="chips" data-chips="florence" role="group" aria-label="Centres d'intérêt — Florence 1504"></div>
+          <button class="btn btn--accent" data-action="gen-itin" data-dest="florence">Composer mon séjour</button>
+          <div class="itin-busy" data-busy="florence" hidden><span class="itin-busy__glyph" aria-hidden="true">⧗</span> Chronos feuillette les chroniques florentines…</div>
+          <div class="itin-output" data-output="florence" aria-live="polite" hidden></div>
+        </div>
+      </section>
+      <section class="dest-cta">
+        <div class="dest-cta__inner container">
+          <button class="btn btn--gold btn--lg" data-action="go-reserver" data-dest="florence">Réserver Florence 1504</button>
+          <button class="btn-link" data-action="go" data-target="paris">Époque suivante · Paris 1889 →</button>
+        </div>
+      </section>
+    </section>
+
+    <!-- ===== RÉSERVATION ===== -->
+    <section class="view" data-view="reserver" aria-label="Réservation" hidden>
+      <div class="resv">
+        <!-- Formulaire -->
+        <form class="resv-form" id="resv-form" novalidate>
+          <div class="resv-head">
+            <div class="resv-head__eyebrow">Réservation</div>
+            <h1 class="resv-head__title">Votre traversée temporelle</h1>
+            <p class="resv-head__sub">Validation immédiate. Un chrononaute référent confirme votre dossier sous 24 heures.</p>
+          </div>
+
+          <div class="resv-group">
+            <div class="field__label" id="resv-dest-label">Destination</div>
+            <div class="resv-grid-3" id="resv-dest-options" role="group" aria-labelledby="resv-dest-label"></div>
+          </div>
+
+          <div class="resv-grid-2">
+            <div class="field">
+              <label class="field__label" for="resv-date">Date de départ (2026)</label>
+              <input class="input" type="date" id="resv-date" min="2026-06-15">
+            </div>
+            <div class="field">
+              <span class="field__label" id="pax-label">Voyageurs</span>
+              <div class="pax-stepper" role="group" aria-labelledby="pax-label">
+                <button type="button" data-action="pax-minus" aria-label="Retirer un voyageur">−</button>
+                <output id="resv-pax" aria-live="polite">2</output>
+                <button type="button" data-action="pax-plus" aria-label="Ajouter un voyageur">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="resv-group">
+            <div class="field__label" id="resv-classe-label">Classe de voyage</div>
+            <div class="resv-classe-grid" role="group" aria-labelledby="resv-classe-label">
+              <button type="button" class="option-card is-active" data-resv-classe="decouverte" aria-pressed="true">
+                <span class="option-card__label">Classe Découverte</span>
+                <span class="option-card__note">Tarif standard · tout inclus</span>
+              </button>
+              <button type="button" class="option-card" data-resv-classe="premiere" aria-pressed="false">
+                <span class="option-card__label">Première Temporelle</span>
+                <span class="option-card__note">+45 % · suite de stase privée</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="resv-grid-2">
+            <div class="field">
+              <label class="field__label" for="resv-nom">Nom complet</label>
+              <input class="input" type="text" id="resv-nom" placeholder="Amélie Verne" autocomplete="name">
+            </div>
+            <div class="field">
+              <label class="field__label" for="resv-email">Email</label>
+              <input class="input" type="email" id="resv-email" placeholder="amelie@exemple.fr" autocomplete="email">
+            </div>
+          </div>
+
+          <div class="resv-footer">
+            <div class="resv-total">
+              <span class="resv-total__label">Estimation totale</span>
+              <span class="resv-total__value" id="resv-total">24 800 €</span>
+            </div>
+            <button type="submit" class="btn btn--gold btn--lg" data-action="submit-resv">Confirmer la traversée</button>
+          </div>
+
+          <div class="form-error" id="resv-error" role="alert" hidden></div>
+        </form>
+
+        <!-- Confirmation -->
+        <div class="confirm" id="resv-confirm" hidden>
+          <div class="confirm__badge" aria-hidden="true">⧗</div>
+          <h1 class="confirm__title">Traversée confirmée</h1>
+          <div class="confirm__ref">Dossier <span id="confirm-ref"></span></div>
+          <dl class="confirm__card">
+            <div class="confirm__row"><dt>Voyageur</dt><dd id="confirm-nom"></dd></div>
+            <div class="confirm__row"><dt>Destination</dt><dd id="confirm-dest"></dd></div>
+            <div class="confirm__row"><dt>Départ</dt><dd id="confirm-date"></dd></div>
+            <div class="confirm__row"><dt>Voyageurs</dt><dd id="confirm-pax"></dd></div>
+            <div class="confirm__row"><dt>Classe</dt><dd id="confirm-classe"></dd></div>
+            <div class="confirm__row confirm__row--total"><dt>Total</dt><dd id="confirm-total"></dd></div>
+          </dl>
+          <p class="confirm__note">Votre chrononaute référent vous contactera sous 24 h pour la préparation d'époque : garde-robe, monnaie, usages et vaccins temporels.</p>
+          <div class="confirm__actions">
+            <button class="btn btn--gold btn--md" data-action="go" data-target="home">Retour à l'agence</button>
+            <button class="btn btn--quiet btn--md" data-action="new-resv">Nouvelle réservation</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="site-footer__grid container">
+      <div class="site-footer__brand">
+        <div class="site-footer__brand-row">
+          <span class="brand__glyph" aria-hidden="true">⧗</span>
+          <span class="brand__name">TimeTravel <em>Agency</em></span>
+        </div>
+        <p class="site-footer__text">Agence de voyage temporel de luxe — fictive. Projet pédagogique M1/M2 IA, Session 2 : Webapp &amp; Agents IA.</p>
+      </div>
+      <div class="site-footer__col">
+        <div class="site-footer__col-title">Destinations</div>
+        <button class="footer-link" data-action="go" data-target="paris">Paris 1889</button>
+        <button class="footer-link" data-action="go" data-target="cretace">Crétacé −65M</button>
+        <button class="footer-link" data-action="go" data-target="florence">Florence 1504</button>
+      </div>
+      <div class="site-footer__col">
+        <div class="site-footer__col-title">Agence</div>
+        <button class="footer-link" data-action="go" data-target="reserver">Réserver</button>
+        <button class="footer-link" data-action="open-quiz">L'oracle de Chronos</button>
+        <button class="footer-link" data-action="open-chat">Parler à Chronos</button>
+      </div>
+    </div>
+    <div class="site-footer__legal container">© 2026 TimeTravel Agency. L'agence décline toute responsabilité en cas de paradoxe causé par le non-respect du protocole de non-interférence.</div>
+  </footer>
+
+  <!-- ===== QUIZ / ORACLE (modal) ===== -->
+  <div class="modal-backdrop" id="quiz-modal" role="dialog" aria-modal="true" aria-labelledby="quiz-dialog-title" hidden>
+    <div class="modal">
+      <button class="modal__close" data-action="close-quiz" aria-label="Fermer l'oracle">×</button>
+
+      <!-- Questions -->
+      <div class="quiz-step" id="quiz-asking">
+        <div class="quiz-head">
+          <div class="quiz-eyebrow" id="quiz-progress">L'oracle de Chronos · 1 / 4</div>
+          <h2 class="quiz-question" id="quiz-dialog-title">…</h2>
+        </div>
+        <div class="quiz-options" id="quiz-options"></div>
+      </div>
+
+      <!-- Chargement -->
+      <div class="quiz-busy" id="quiz-busy" hidden>
+        <div class="quiz-busy__icon" aria-hidden="true">⧗</div>
+        <div class="quiz-busy__text">L'oracle consulte les archives temporelles…</div>
+      </div>
+
+      <!-- Résultat -->
+      <div class="quiz-result" id="quiz-done" hidden>
+        <div class="quiz-eyebrow">L'oracle a parlé</div>
+        <h2 class="quiz-result__title" id="quiz-result-title"></h2>
+        <p class="quiz-result__text" id="quiz-result-text"></p>
+        <div class="quiz-result__actions">
+          <button class="btn btn--gold btn--md" data-action="quiz-go">Explorer cette époque</button>
+          <button class="btn btn--quiet btn--md" data-action="restart-quiz">Recommencer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHAT CHRONOS ===== -->
+  <div class="chat" id="chat" role="dialog" aria-label="Chronos, concierge temporel" hidden>
+    <div class="chat__header">
+      <div class="chat__avatar" aria-hidden="true">C</div>
+      <div class="chat__id">
+        <div class="chat__name">Chronos</div>
+        <div class="chat__mode"><span class="chat__mode-dot" aria-hidden="true"></span><span id="chat-mode">Concierge temporel · mode local</span></div>
+      </div>
+      <button class="chat__gear" id="chat-gear" aria-label="Réglages (clé IA)" aria-expanded="false">⚙</button>
+      <button class="chat__close" data-action="close-chat" aria-label="Fermer le chat">×</button>
+    </div>
+
+    <!-- Réglages clé Mistral -->
+    <div class="chat__settings" id="chat-settings" hidden>
+      <div class="chat__settings-title">Clé API Mistral</div>
+      <div class="chat__settings-row">
+        <input class="input" type="password" id="chat-key-input" placeholder="Collez votre clé…" autocomplete="off">
+        <button class="chat__send" type="button" id="chat-key-save">OK</button>
+      </div>
+      <div class="chat__settings-status" id="chat-key-status"></div>
+      <p class="chat__settings-note">Votre clé reste dans votre navigateur (localStorage) et n'est envoyée qu'à <strong>api.mistral.ai</strong>. Clé gratuite : <a href="https://console.mistral.ai/" target="_blank" rel="noopener">console.mistral.ai</a>. <button type="button" id="chat-key-clear" class="footer-link" style="display:inline;font-size:11px;text-transform:uppercase;letter-spacing:.1em">Effacer</button></p>
+    </div>
+
+    <div class="chat__body" id="chat-body" aria-live="polite"></div>
+    <div class="chat__suggestions" id="chat-suggestions"></div>
+    <div class="chat__inputbar">
+      <input class="input" type="text" id="chat-input" placeholder="Votre question…" autocomplete="off" aria-label="Votre message pour Chronos">
+      <button class="chat__send" id="chat-send" type="button">Envoyer</button>
+    </div>
+  </div>
+  <button class="chat-fab" id="chat-fab" aria-label="Parler à Chronos" aria-expanded="false">C</button>
+
+</body>
+</html>

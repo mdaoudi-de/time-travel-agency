@@ -1,0 +1,157 @@
+/* ============================================================
+   TimeTravel Agency — base.css
+   Variables, reset, typographie, keyframes, accessibilité
+   ============================================================ */
+
+:root {
+  /* Palette « luxe sombre » */
+  --bg:        #0B0908;
+  --bg-2:      #131009;
+  --bg-3:      #181410;
+  --bg-bubble: #1B1710;
+  --panel:     #12100B;
+  --gold:      #C8A75C;
+  --gold-2:    #E8D5A4;
+  --ivory:     #EDE4D2;
+  --ivory-2:   #F4EDDD;
+  --parchment: #D8CCB2;
+  --text-soft: #B8AD96;
+  --text-mid:  #C9BBA0;
+  --muted:     #9A8F7A;
+  --muted-2:   #6E6452;
+  --muted-3:   #564E3F;
+  --line:      #2E2820;
+  --error:     #D08770;
+
+  /* Alphas or, utilisés partout */
+  --gold-a05: rgba(200, 167, 92, .05);
+  --gold-a08: rgba(200, 167, 92, .08);
+  --gold-a10: rgba(200, 167, 92, .10);
+  --gold-a12: rgba(200, 167, 92, .12);
+  --gold-a14: rgba(200, 167, 92, .14);
+  --gold-a18: rgba(200, 167, 92, .18);
+  --gold-a20: rgba(200, 167, 92, .20);
+  --gold-a25: rgba(200, 167, 92, .25);
+  --gold-a30: rgba(200, 167, 92, .30);
+  --gold-a45: rgba(200, 167, 92, .45);
+  --gold-a50: rgba(200, 167, 92, .50);
+  --gold-a60: rgba(200, 167, 92, .60);
+
+  /* Accent par défaut (or) — surchargé par vue destination */
+  --accent:       var(--gold);
+  --accent-hover: var(--gold-2);
+  --accent-text:  var(--text-mid);
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans:  'Jost', 'Segoe UI', system-ui, sans-serif;
+
+  --container: 1180px;
+  --pad-x: 36px;
+  --header-h: 66px;
+}
+
+/* ---------- Reset ---------- */
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+}
+
+body {
+  color: var(--ivory);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p { margin: 0; }
+figure { margin: 0; }
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; }
+img { display: block; max-width: 100%; }
+
+[hidden] { display: none !important; }
+
+::selection { background: var(--gold); color: var(--bg); }
+
+/* Scrollbar discrète, cohérente avec le thème */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-a45); }
+
+/* ---------- Accessibilité ---------- */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: 16px;
+  z-index: 500;
+  background: var(--gold);
+  color: var(--bg);
+  padding: 10px 18px;
+  border-radius: 0 0 10px 10px;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-decoration: none;
+  transition: top .25s ease;
+}
+.skip-link:focus { top: 0; }
+
+/* ---------- Typo utilitaires ---------- */
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-left: var(--pad-x);
+  padding-right: var(--pad-x);
+}
+
+/* ---------- Keyframes (portés de l'app d'origine) ---------- */
+@keyframes ttRotate   { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes ttFadeUp   { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ttFadeIn   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ttRing     { 0% { transform: translate(-50%, -50%) scale(.96); opacity: .5; } 50% { transform: translate(-50%, -50%) scale(1.05); opacity: .15; } 100% { transform: translate(-50%, -50%) scale(.96); opacity: .5; } }
+@keyframes ttJumpRing { from { transform: translate(-50%, -50%) scale(.15); opacity: .8; } to { transform: translate(-50%, -50%) scale(2.6); opacity: 0; } }
+@keyframes ttBlink    { 0%, 80%, 100% { opacity: .2; } 40% { opacity: 1; } }
+@keyframes ttPulseDot { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+
+/* ---------- Apparition au scroll (IntersectionObserver) ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity .7s ease, transform .7s ease;
+  transition-delay: var(--reveal-delay, 0s);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Mouvement réduit ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+}
