@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Jost:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #0B0908; }
+  * { box-sizing: border-box; }
+  ::selection { background: #C8A75C; color: #0B0908; }
+  input, textarea, select, button { font-family: inherit; }
+  @keyframes ttRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes ttFadeUp { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes ttFadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes ttRing { 0% { transform: translate(-50%, -50%) scale(.96); opacity: .5; } 50% { transform: translate(-50%, -50%) scale(1.05); opacity: .15; } 100% { transform: translate(-50%, -50%) scale(.96); opacity: .5; } }
+  @keyframes ttJumpRing { from { transform: translate(-50%, -50%) scale(.15); opacity: .8; } to { transform: translate(-50%, -50%) scale(2.6); opacity: 0; } }
+  @keyframes ttBlink { 0%, 80%, 100% { opacity: .2; } 40% { opacity: 1; } }
+  @keyframes ttPulseDot { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+</style>
+</helmet>
+
+<div style="background: #0B0908; color: #EDE4D2; font-family: 'Jost', sans-serif; min-height: 100vh; overflow-x: hidden;">
+
+  <!-- ===== SAUT TEMPOREL (overlay) ===== -->
+  <sc-if value="{{ jumping }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Saut temporel" style="position: fixed; inset: 0; z-index: 400; background: #050403; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: ttFadeIn .3s ease both; opacity: {{ jumpOpacity }}; transition: opacity .45s ease;">
+      <div style="position: absolute; left: 50%; top: 50%; width: 420px; height: 420px; border: 1px solid rgba(200, 167, 92, .5); border-radius: 50%; animation: ttJumpRing 1.6s ease-out infinite;"></div>
+      <div style="position: absolute; left: 50%; top: 50%; width: 420px; height: 420px; border: 1px solid rgba(200, 167, 92, .35); border-radius: 50%; animation: ttJumpRing 1.6s ease-out .55s infinite;"></div>
+      <div style="font-size: 11px; letter-spacing: .38em; text-transform: uppercase; color: #9A8F7A; margin-bottom: 22px;">Translation temporelle en cours</div>
+      <div ref="{{ counterRef }}" style="font-family: 'Cormorant Garamond', serif; font-size: clamp(64px, 11vw, 150px); font-weight: 500; color: #E8D5A4; line-height: 1; font-variant-numeric: tabular-nums;">2026</div>
+      <div style="margin-top: 26px; display: flex; gap: 8px;">
+        <span style="width: 5px; height: 5px; border-radius: 50%; background: #C8A75C; animation: ttBlink 1.1s infinite;"></span>
+        <span style="width: 5px; height: 5px; border-radius: 50%; background: #C8A75C; animation: ttBlink 1.1s .18s infinite;"></span>
+        <span style="width: 5px; height: 5px; border-radius: 50%; background: #C8A75C; animation: ttBlink 1.1s .36s infinite;"></span>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== HUD / HEADER ===== -->
+  <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 36px; height: 66px; background: rgba(11, 9, 8, .6); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(200, 167, 92, .14);">
+    <button onClick="{{ goHome }}" style="display: flex; align-items: center; gap: 12px; background: none; border: none; cursor: pointer; color: #EDE4D2; padding: 0;">
+      <span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #C8A75C;">⧗</span>
+      <span style="font-size: 13px; letter-spacing: .3em; text-transform: uppercase; font-weight: 500;">TimeTravel <span style="color: #C8A75C;">Agency</span></span>
+    </button>
+    <nav style="display: flex; align-items: center; gap: 26px;">
+      <button onClick="{{ goParis }}" style="background: none; border: none; cursor: pointer; color: #B8AD96; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; padding: 0;" style-hover="color: #E8D5A4;">Paris 1889</button>
+      <button onClick="{{ goCretace }}" style="background: none; border: none; cursor: pointer; color: #B8AD96; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; padding: 0;" style-hover="color: #E8D5A4;">Crétacé</button>
+      <button onClick="{{ goFlorence }}" style="background: none; border: none; cursor: pointer; color: #B8AD96; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; padding: 0;" style-hover="color: #E8D5A4;">Florence 1504</button>
+      <button onClick="{{ goReserver }}" style="background: rgba(200, 167, 92, .12); border: 1px solid rgba(200, 167, 92, .45); cursor: pointer; color: #E8D5A4; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; padding: 9px 18px; border-radius: 99px;" style-hover="background: #C8A75C; color: #0B0908;">Réserver</button>
+      <div style="display: flex; align-items: center; gap: 8px; border-left: 1px solid rgba(200, 167, 92, .2); padding-left: 22px;">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: #C8A75C; animation: ttPulseDot 2.4s infinite;"></span>
+        <span style="font-size: 11px; letter-spacing: .22em; color: #9A8F7A; text-transform: uppercase;">Époque</span>
+        <span style="font-size: 13px; color: #E8D5A4; font-variant-numeric: tabular-nums;">{{ hudYear }}</span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== ACCUEIL ===== -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <main data-screen-label="Accueil">
+      <!-- Hero -->
+      <section style="position: relative; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow: hidden; padding: 120px 24px 80px 24px;">
+        <div style="position: absolute; inset: -40%; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(200, 167, 92, .07) 40deg, transparent 90deg, rgba(200, 167, 92, .05) 200deg, transparent 260deg, rgba(200, 167, 92, .08) 330deg, transparent 360deg); animation: ttRotate 90s linear infinite;"></div>
+        <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 45%, rgba(200, 167, 92, .08), transparent 70%);"></div>
+        <div style="position: absolute; left: 50%; top: 50%; width: 44vw; height: 44vw; border: 1px solid rgba(200, 167, 92, .14); border-radius: 50%; animation: ttRing 9s ease-in-out infinite;"></div>
+        <div style="position: absolute; left: 50%; top: 50%; width: 66vw; height: 66vw; border: 1px solid rgba(200, 167, 92, .08); border-radius: 50%; animation: ttRing 12s ease-in-out 1.2s infinite;"></div>
+        <div style="position: absolute; left: 50%; top: 50%; width: 88vw; height: 88vw; border: 1px solid rgba(200, 167, 92, .05); border-radius: 50%; animation: ttRing 15s ease-in-out 2.4s infinite;"></div>
+        <div style="position: relative; max-width: 880px; display: flex; flex-direction: column; align-items: center; gap: 28px;">
+          <div style="font-size: 12px; letter-spacing: .4em; text-transform: uppercase; color: #C8A75C; animation: ttFadeUp .9s ease .1s both;">Agence de voyage temporel — Terminal de Paris, 2026</div>
+          <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(48px, 7vw, 92px); line-height: 1.06; margin: 0; color: #F4EDDD; animation: ttFadeUp .9s ease .25s both;">Le temps n'est plus<br><em style="color: #E8D5A4;">une frontière.</em></h1>
+          <p style="font-size: 18px; font-weight: 300; line-height: 1.7; color: #B8AD96; max-width: 560px; margin: 0; text-wrap: pretty; animation: ttFadeUp .9s ease .4s both;">Trois époques. Un départ. Des souvenirs vieux de plusieurs siècles — ou de soixante-cinq millions d'années.</p>
+          <div style="display: flex; gap: 16px; margin-top: 10px; animation: ttFadeUp .9s ease .55s both;">
+            <button onClick="{{ scrollToDests }}" style="background: #C8A75C; color: #0B0908; border: none; cursor: pointer; padding: 16px 32px; border-radius: 99px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500;" style-hover="background: #E8D5A4;">Découvrir les époques</button>
+            <button onClick="{{ openQuiz }}" style="background: transparent; color: #E8D5A4; border: 1px solid rgba(200, 167, 92, .45); cursor: pointer; padding: 16px 32px; border-radius: 99px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase;" style-hover="border-color: #C8A75C; background: rgba(200, 167, 92, .1);">Trouver mon époque</button>
+          </div>
+        </div>
+        <div style="position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%); font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #6E6452;">Défiler</div>
+      </section>
+
+      <!-- Piliers -->
+      <section style="max-width: 1180px; margin: 0 auto; padding: 90px 36px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px; border-top: 1px solid rgba(200, 167, 92, .1);">
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; color: #C8A75C;">01</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #F4EDDD;">Sécurité paradoxale</div>
+          <p style="font-size: 15px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Champ de stase certifié, protocole strict de non-interférence : votre passage ne laisse aucune trace dans la ligne temporelle.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; color: #C8A75C;">02</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #F4EDDD;">Immersion totale</div>
+          <p style="font-size: 15px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Garde-robe, monnaie et usages d'époque fournis avant le départ. Vous ne visitez pas le passé : vous y vivez.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; color: #C8A75C;">03</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #F4EDDD;">Conciergerie chrononaute</div>
+          <p style="font-size: 15px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Un guide expert vous accompagne à chaque instant — et Chronos, notre concierge IA, répond à vos questions avant le départ.</p>
+        </div>
+      </section>
+
+      <!-- Destinations -->
+      <section id="tt-destinations" style="max-width: 1180px; margin: 0 auto; padding: 30px 36px 110px 36px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 44px;">
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 44px; color: #F4EDDD; margin: 0;">Trois époques au départ</h2>
+          <div style="font-size: 12px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">Saison 2026</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px;">
+          <sc-for list="{{ destCards }}" as="c" hint-placeholder-count="3">
+            <div onClick="{{ c.onClick }}" style="cursor: pointer; background: #131009; border: 1px solid rgba(200, 167, 92, .14); border-radius: 16px; overflow: hidden; transition: transform .35s ease, border-color .35s ease; display: flex; flex-direction: column;" style-hover="transform: translateY(-7px); border-color: rgba(200, 167, 92, .5);">
+              <image-slot id="{{ c.slotId }}" placeholder="{{ c.placeholder }}" shape="rect" style="width: 100%; height: 230px; display: block;"></image-slot>
+              <div style="padding: 24px 24px 28px 24px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: #C8A75C;">{{ c.year }}</div>
+                <div style="font-family: 'Cormorant Garamond', serif; font-size: 28px; color: #F4EDDD; line-height: 1.15;">{{ c.title }}</div>
+                <p style="font-size: 14px; font-weight: 300; line-height: 1.65; color: #9A8F7A; margin: 0; text-wrap: pretty;">{{ c.teaser }}</p>
+                <div style="margin-top: 8px; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #E8D5A4;">Explorer →</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- Bande quiz -->
+      <section style="border-top: 1px solid rgba(200, 167, 92, .1); border-bottom: 1px solid rgba(200, 167, 92, .1); background: radial-gradient(ellipse 50% 100% at 50% 100%, rgba(200, 167, 92, .07), transparent 70%);">
+        <div style="max-width: 760px; margin: 0 auto; padding: 90px 36px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 26px; color: #C8A75C;">⧗</div>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 40px; color: #F4EDDD; margin: 0;">Indécis face à l'éternité ?</h2>
+          <p style="font-size: 16px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; max-width: 480px; text-wrap: pretty;">Quatre questions. L'oracle de Chronos analyse vos réponses et compose une recommandation rien que pour vous.</p>
+          <button onClick="{{ openQuiz }}" style="margin-top: 8px; background: transparent; color: #E8D5A4; border: 1px solid rgba(200, 167, 92, .45); cursor: pointer; padding: 15px 34px; border-radius: 99px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase;" style-hover="background: #C8A75C; color: #0B0908; border-color: #C8A75C;">Consulter l'oracle</button>
+        </div>
+      </section>
+    </main>
+  </sc-if>
+
+  <!-- ===== PARIS 1889 ===== -->
+  <sc-if value="{{ isParis }}" hint-placeholder-val="{{ false }}">
+    <main data-screen-label="Paris 1889">
+      <section style="position: relative; height: 76vh; min-height: 520px; overflow: hidden; background: linear-gradient(180deg, #161009 0%, #0B0908 100%);">
+        <image-slot id="hero-paris" placeholder="Déposez votre visuel Session 1 — Paris 1889" shape="rect" style="position: absolute; inset: 0; width: 100%; height: 100%;"></image-slot>
+        <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11, 9, 8, .55) 0%, rgba(11, 9, 8, .1) 40%, rgba(11, 9, 8, .92) 100%); pointer-events: none;"></div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; pointer-events: none;">
+          <div style="max-width: 1180px; margin: 0 auto; padding: 0 36px 48px 36px;">
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(60px, 9vw, 120px); color: rgba(210, 160, 78, .9); line-height: 1; animation: ttFadeUp .8s ease both;">1889</div>
+            <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(36px, 4.6vw, 58px); color: #F4EDDD; margin: 6px 0 10px 0; animation: ttFadeUp .8s ease .15s both;">Paris, Belle Époque</h1>
+            <p style="font-size: 17px; font-weight: 300; color: #C9BBA0; margin: 0; max-width: 540px; animation: ttFadeUp .8s ease .3s both; text-wrap: pretty;">La Ville Lumière à l'heure de tous les possibles.</p>
+          </div>
+        </div>
+      </section>
+      <section style="border-bottom: 1px solid rgba(210, 160, 78, .15);">
+        <div style="max-width: 1180px; margin: 0 auto; padding: 26px 36px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">Époque</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #E8D5A4;">Mai 1889</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">Durée</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #E8D5A4;">4 jours</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">À partir de</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #E8D5A4;">12 400 € / pers.</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">Risque paradoxal</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #E8D5A4;">Faible</span></div>
+        </div>
+      </section>
+      <section style="max-width: 880px; margin: 0 auto; padding: 80px 36px 30px 36px;">
+        <p style="font-family: 'Cormorant Garamond', serif; font-size: 26px; line-height: 1.55; color: #D8CCB2; margin: 0; text-wrap: pretty;">Mai 1889. L'Exposition Universelle bat son plein, la tour de M. Eiffel vient d'ouvrir ses ascenseurs au public, et le Tout-Paris hésite encore entre scandale et émerveillement. Vous arrivez en habit de soirée, par la porte de service de l'Histoire.</p>
+      </section>
+      <section style="max-width: 1180px; margin: 0 auto; padding: 40px 36px 70px 36px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px;">
+        <div style="background: #141008; border: 1px solid rgba(210, 160, 78, .18); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #D2A04E;">I</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #F4EDDD;">L'inauguration de la Tour</div>
+          <p style="font-size: 14px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Gravissez les 1 710 marches avant la foule. Champagne au premier étage, Paris à vos pieds au coucher du soleil.</p>
+        </div>
+        <div style="background: #141008; border: 1px solid rgba(210, 160, 78, .18); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #D2A04E;">II</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #F4EDDD;">La Galerie des Machines</div>
+          <p style="font-size: 14px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Trois cents mètres de verre et d'acier : le futur tel qu'on le rêvait en 1889, dans un vacarme de pistons et d'applaudissements.</p>
+        </div>
+        <div style="background: #141008; border: 1px solid rgba(210, 160, 78, .18); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #D2A04E;">III</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #F4EDDD;">Une soirée au cabaret</div>
+          <p style="font-size: 14px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Cancan, conversations avec le Tout-Paris et absinthe — avec modération temporelle, le protocole y veille.</p>
+        </div>
+      </section>
+      <section style="max-width: 880px; margin: 0 auto; padding: 0 36px 80px 36px;">
+        <div style="background: rgba(210, 160, 78, .05); border: 1px solid rgba(210, 160, 78, .2); border-radius: 18px; padding: 40px;">
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #D2A04E; margin-bottom: 10px;">Composé par Chronos · IA</div>
+          <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 30px; color: #F4EDDD; margin: 0 0 8px 0;">Votre itinéraire sur mesure</h3>
+          <p style="font-size: 14px; font-weight: 300; color: #9A8F7A; margin: 0 0 22px 0;">Choisissez vos envies, notre concierge IA compose vos 4 jours en 1889.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px;">
+            <sc-for list="{{ parisChips }}" as="ch" hint-placeholder-count="5">
+              <sc-if value="{{ ch.active }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ ch.onClick }}" style="background: #C8A75C; color: #0B0908; border: 1px solid #C8A75C; cursor: pointer; padding: 9px 18px; border-radius: 99px; font-size: 13px;">{{ ch.label }}</button>
+              </sc-if>
+              <sc-if value="{{ ch.inactive }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ ch.onClick }}" style="background: transparent; color: #B8AD96; border: 1px solid #2E2820; cursor: pointer; padding: 9px 18px; border-radius: 99px; font-size: 13px;" style-hover="border-color: rgba(200, 167, 92, .6); color: #E8D5A4;">{{ ch.label }}</button>
+              </sc-if>
+            </sc-for>
+          </div>
+          <button onClick="{{ genItinParis }}" style="background: #C8A75C; color: #0B0908; border: none; cursor: pointer; padding: 14px 28px; border-radius: 99px; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500;" style-hover="background: #E8D5A4;">Composer mon itinéraire</button>
+          <sc-if value="{{ itinParisBusy }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 24px; font-size: 14px; color: #C8A75C; display: flex; align-items: center; gap: 10px;"><span style="animation: ttBlink 1.1s infinite;">⧗</span> Chronos consulte les archives de 1889…</div>
+          </sc-if>
+          <sc-if value="{{ hasItinParis }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 26px; padding-top: 24px; border-top: 1px solid rgba(210, 160, 78, .2); white-space: pre-line; font-size: 15px; font-weight: 300; line-height: 1.85; color: #C9BBA0; animation: ttFadeIn .6s ease both;">{{ itinParisText }}</div>
+          </sc-if>
+        </div>
+      </section>
+      <section style="border-top: 1px solid rgba(200, 167, 92, .1);">
+        <div style="max-width: 1180px; margin: 0 auto; padding: 56px 36px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+          <button onClick="{{ goReserverParis }}" style="background: #C8A75C; color: #0B0908; border: none; cursor: pointer; padding: 17px 36px; border-radius: 99px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500;" style-hover="background: #E8D5A4;">Réserver Paris 1889</button>
+          <button onClick="{{ goCretace }}" style="background: none; border: none; cursor: pointer; color: #9A8F7A; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; padding: 0;" style-hover="color: #E8D5A4;">Époque suivante · Crétacé →</button>
+        </div>
+      </section>
+    </main>
+  </sc-if>
+
+  <!-- ===== CRÉTACÉ ===== -->
+  <sc-if value="{{ isCretace }}" hint-placeholder-val="{{ false }}">
+    <main data-screen-label="Crétacé">
+      <section style="position: relative; height: 76vh; min-height: 520px; overflow: hidden; background: linear-gradient(180deg, #0D120C 0%, #0B0908 100%);">
+        <image-slot id="hero-cretace" placeholder="Déposez votre visuel Session 1 — Crétacé" shape="rect" style="position: absolute; inset: 0; width: 100%; height: 100%;"></image-slot>
+        <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11, 9, 8, .55) 0%, rgba(11, 9, 8, .1) 40%, rgba(11, 9, 8, .92) 100%); pointer-events: none;"></div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; pointer-events: none;">
+          <div style="max-width: 1180px; margin: 0 auto; padding: 0 36px 48px 36px;">
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(44px, 6.6vw, 88px); color: rgba(127, 168, 107, .9); line-height: 1; animation: ttFadeUp .8s ease both;">−65 000 000</div>
+            <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(36px, 4.6vw, 58px); color: #F4EDDD; margin: 6px 0 10px 0; animation: ttFadeUp .8s ease .15s both;">Le Crétacé</h1>
+            <p style="font-size: 17px; font-weight: 300; color: #B9C4AE; margin: 0; max-width: 560px; animation: ttFadeUp .8s ease .3s both; text-wrap: pretty;">Soixante-cinq millions d'années avant la première empreinte humaine.</p>
+          </div>
+        </div>
+      </section>
+      <section style="border-bottom: 1px solid rgba(127, 168, 107, .18);">
+        <div style="max-width: 1180px; margin: 0 auto; padding: 26px 36px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">Époque</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #CDD8C2;">Maastrichtien</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">Durée</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #CDD8C2;">3 jours</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">À partir de</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #CDD8C2;">24 800 € / pers.</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">Risque paradoxal</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #CDD8C2;">Élevé · escorte de stase</span></div>
+        </div>
+      </section>
+      <section style="max-width: 880px; margin: 0 auto; padding: 80px 36px 30px 36px;">
+        <p style="font-family: 'Cormorant Garamond', serif; font-size: 26px; line-height: 1.55; color: #D8CCB2; margin: 0; text-wrap: pretty;">L'air est plus dense, la lumière plus crue, le monde immensément plus vaste. Aucune route, aucun témoin : seulement les derniers géants de la Terre, observés depuis nos plateformes de stase. Le safari ultime — trois jours au bord de la fin d'un monde.</p>
+      </section>
+      <section style="max-width: 1180px; margin: 0 auto; padding: 40px 36px 70px 36px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px;">
+        <div style="background: #0F130D; border: 1px solid rgba(127, 168, 107, .2); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #7FA86B;">I</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #F4EDDD;">L'aube des géants</div>
+          <p style="font-size: 14px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Depuis la plateforme d'observation, un troupeau d'alamosaures traverse la plaine dans la brume du matin.</p>
+        </div>
+        <div style="background: #0F130D; border: 1px solid rgba(127, 168, 107, .2); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #7FA86B;">II</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #F4EDDD;">L'affût du tyran</div>
+          <p style="font-size: 14px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">À distance respectueuse — quatre cents mètres et un champ de stase — observez le Tyrannosaurus rex en chasse.</p>
+        </div>
+        <div style="background: #0F130D; border: 1px solid rgba(127, 168, 107, .2); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #7FA86B;">III</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #F4EDDD;">Nuit primitive</div>
+          <p style="font-size: 14px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Un ciel sans aucune lumière humaine. La Voie lactée telle que personne ne la reverra jamais.</p>
+        </div>
+      </section>
+      <section style="max-width: 880px; margin: 0 auto; padding: 0 36px 80px 36px;">
+        <div style="background: rgba(127, 168, 107, .05); border: 1px solid rgba(127, 168, 107, .22); border-radius: 18px; padding: 40px;">
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #7FA86B; margin-bottom: 10px;">Composé par Chronos · IA</div>
+          <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 30px; color: #F4EDDD; margin: 0 0 8px 0;">Votre expédition sur mesure</h3>
+          <p style="font-size: 14px; font-weight: 300; color: #9A8F7A; margin: 0 0 22px 0;">Choisissez vos envies, notre concierge IA compose vos 3 jours au Crétacé.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px;">
+            <sc-for list="{{ cretaceChips }}" as="ch" hint-placeholder-count="5">
+              <sc-if value="{{ ch.active }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ ch.onClick }}" style="background: #7FA86B; color: #0B0908; border: 1px solid #7FA86B; cursor: pointer; padding: 9px 18px; border-radius: 99px; font-size: 13px;">{{ ch.label }}</button>
+              </sc-if>
+              <sc-if value="{{ ch.inactive }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ ch.onClick }}" style="background: transparent; color: #B8AD96; border: 1px solid #2E2820; cursor: pointer; padding: 9px 18px; border-radius: 99px; font-size: 13px;" style-hover="border-color: rgba(127, 168, 107, .7); color: #E8D5A4;">{{ ch.label }}</button>
+              </sc-if>
+            </sc-for>
+          </div>
+          <button onClick="{{ genItinCretace }}" style="background: #7FA86B; color: #0B0908; border: none; cursor: pointer; padding: 14px 28px; border-radius: 99px; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500;" style-hover="background: #A3C293;">Composer mon expédition</button>
+          <sc-if value="{{ itinCretaceBusy }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 24px; font-size: 14px; color: #7FA86B; display: flex; align-items: center; gap: 10px;"><span style="animation: ttBlink 1.1s infinite;">⧗</span> Chronos étudie les relevés du Maastrichtien…</div>
+          </sc-if>
+          <sc-if value="{{ hasItinCretace }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 26px; padding-top: 24px; border-top: 1px solid rgba(127, 168, 107, .22); white-space: pre-line; font-size: 15px; font-weight: 300; line-height: 1.85; color: #C2CBB7; animation: ttFadeIn .6s ease both;">{{ itinCretaceText }}</div>
+          </sc-if>
+        </div>
+      </section>
+      <section style="border-top: 1px solid rgba(200, 167, 92, .1);">
+        <div style="max-width: 1180px; margin: 0 auto; padding: 56px 36px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+          <button onClick="{{ goReserverCretace }}" style="background: #C8A75C; color: #0B0908; border: none; cursor: pointer; padding: 17px 36px; border-radius: 99px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500;" style-hover="background: #E8D5A4;">Réserver le Crétacé</button>
+          <button onClick="{{ goFlorence }}" style="background: none; border: none; cursor: pointer; color: #9A8F7A; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; padding: 0;" style-hover="color: #E8D5A4;">Époque suivante · Florence 1504 →</button>
+        </div>
+      </section>
+    </main>
+  </sc-if>
+
+  <!-- ===== FLORENCE 1504 ===== -->
+  <sc-if value="{{ isFlorence }}" hint-placeholder-val="{{ false }}">
+    <main data-screen-label="Florence 1504">
+      <section style="position: relative; height: 76vh; min-height: 520px; overflow: hidden; background: linear-gradient(180deg, #160F0A 0%, #0B0908 100%);">
+        <image-slot id="hero-florence" placeholder="Déposez votre visuel Session 1 — Florence 1504" shape="rect" style="position: absolute; inset: 0; width: 100%; height: 100%;"></image-slot>
+        <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11, 9, 8, .55) 0%, rgba(11, 9, 8, .1) 40%, rgba(11, 9, 8, .92) 100%); pointer-events: none;"></div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; pointer-events: none;">
+          <div style="max-width: 1180px; margin: 0 auto; padding: 0 36px 48px 36px;">
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(60px, 9vw, 120px); color: rgba(201, 130, 79, .9); line-height: 1; animation: ttFadeUp .8s ease both;">1504</div>
+            <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(36px, 4.6vw, 58px); color: #F4EDDD; margin: 6px 0 10px 0; animation: ttFadeUp .8s ease .15s both;">Florence, Renaissance</h1>
+            <p style="font-size: 17px; font-weight: 300; color: #D3BCA8; margin: 0; max-width: 560px; animation: ttFadeUp .8s ease .3s both; text-wrap: pretty;">La Renaissance, à l'instant exact où elle bascule dans la légende.</p>
+          </div>
+        </div>
+      </section>
+      <section style="border-bottom: 1px solid rgba(201, 130, 79, .18);">
+        <div style="max-width: 1180px; margin: 0 auto; padding: 26px 36px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">Époque</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #E5CDB8;">Septembre 1504</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">Durée</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #E5CDB8;">4 jours</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">À partir de</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #E5CDB8;">14 900 € / pers.</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: .25em; text-transform: uppercase; color: #9A8F7A;">Risque paradoxal</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #E5CDB8;">Modéré</span></div>
+        </div>
+      </section>
+      <section style="max-width: 880px; margin: 0 auto; padding: 80px 36px 30px 36px;">
+        <p style="font-family: 'Cormorant Garamond', serif; font-size: 26px; line-height: 1.55; color: #D8CCB2; margin: 0; text-wrap: pretty;">Septembre 1504. Le David vient d'être hissé devant le Palazzo Vecchio, Léonard remplit ses carnets et toute la ville bruisse de génie et d'intrigues. Vous arrivez en étoffes toscanes, lettre d'introduction des Médicis en poche.</p>
+      </section>
+      <section style="max-width: 1180px; margin: 0 auto; padding: 40px 36px 70px 36px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px;">
+        <div style="background: #150F09; border: 1px solid rgba(201, 130, 79, .2); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #C9824F;">I</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #F4EDDD;">Le dévoilement du David</div>
+          <p style="font-size: 14px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Place de la Seigneurie, la foule retient son souffle devant le colosse de marbre de Michel-Ange.</p>
+        </div>
+        <div style="background: #150F09; border: 1px solid rgba(201, 130, 79, .2); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #C9824F;">II</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #F4EDDD;">L'atelier de Léonard</div>
+          <p style="font-size: 14px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Pigments, carnets et machines volantes : une visite privée, sous strictes conditions de non-interférence.</p>
+        </div>
+        <div style="background: #150F09; border: 1px solid rgba(201, 130, 79, .2); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #C9824F;">III</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #F4EDDD;">Banquet chez les Médicis</div>
+          <p style="font-size: 14px; font-weight: 300; line-height: 1.7; color: #9A8F7A; margin: 0; text-wrap: pretty;">Vins toscans, musique et intrigues de cour — dans les règles de l'art, et de la discrétion.</p>
+        </div>
+      </section>
+      <section style="max-width: 880px; margin: 0 auto; padding: 0 36px 80px 36px;">
+        <div style="background: rgba(201, 130, 79, .05); border: 1px solid rgba(201, 130, 79, .22); border-radius: 18px; padding: 40px;">
+          <div style="font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #C9824F; margin-bottom: 10px;">Composé par Chronos · IA</div>
+          <h3 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 30px; color: #F4EDDD; margin: 0 0 8px 0;">Votre séjour sur mesure</h3>
+          <p style="font-size: 14px; font-weight: 300; color: #9A8F7A; margin: 0 0 22px 0;">Choisissez vos envies, notre concierge IA compose vos 4 jours en 1504.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px;">
+            <sc-for list="{{ florenceChips }}" as="ch" hint-placeholder-count="5">
+              <sc-if value="{{ ch.active }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ ch.onClick }}" style="background: #C9824F; color: #0B0908; border: 1px solid #C9824F; cursor: pointer; padding: 9px 18px; border-radius: 99px; font-size: 13px;">{{ ch.label }}</button>
+              </sc-if>
+              <sc-if value="{{ ch.inactive }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ ch.onClick }}" style="background: transparent; color: #B8AD96; border: 1px solid #2E2820; cursor: pointer; padding: 9px 18px; border-radius: 99px; font-size: 13px;" style-hover="border-color: rgba(201, 130, 79, .7); color: #E8D5A4;">{{ ch.label }}</button>
+              </sc-if>
+            </sc-for>
+          </div>
+          <button onClick="{{ genItinFlorence }}" style="background: #C9824F; color: #0B0908; border: none; cursor: pointer; padding: 14px 28px; border-radius: 99px; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500;" style-hover="background: #E0A678;">Composer mon séjour</button>
+          <sc-if value="{{ itinFlorenceBusy }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 24px; font-size: 14px; color: #C9824F; display: flex; align-items: center; gap: 10px;"><span style="animation: ttBlink 1.1s infinite;">⧗</span> Chronos feuillette les chroniques florentines…</div>
+          </sc-if>
+          <sc-if value="{{ hasItinFlorence }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 26px; padding-top: 24px; border-top: 1px solid rgba(201, 130, 79, .22); white-space: pre-line; font-size: 15px; font-weight: 300; line-height: 1.85; color: #D3C0AC; animation: ttFadeIn .6s ease both;">{{ itinFlorenceText }}</div>
+          </sc-if>
+        </div>
+      </section>
+      <section style="border-top: 1px solid rgba(200, 167, 92, .1);">
+        <div style="max-width: 1180px; margin: 0 auto; padding: 56px 36px; display: flex; align-items: center; justify-content: space-between; gap: 24px;">
+          <button onClick="{{ goReserverFlorence }}" style="background: #C8A75C; color: #0B0908; border: none; cursor: pointer; padding: 17px 36px; border-radius: 99px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500;" style-hover="background: #E8D5A4;">Réserver Florence 1504</button>
+          <button onClick="{{ goParis }}" style="background: none; border: none; cursor: pointer; color: #9A8F7A; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; padding: 0;" style-hover="color: #E8D5A4;">Époque suivante · Paris 1889 →</button>
+        </div>
+      </section>
+    </main>
+  </sc-if>
+
+  <!-- ===== RÉSERVATION ===== -->
+  <sc-if value="{{ isReserver }}" hint-placeholder-val="{{ false }}">
+    <main data-screen-label="Réservation" style="max-width: 760px; margin: 0 auto; padding: 140px 36px 100px 36px;">
+      <sc-if value="{{ resvFormVisible }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 36px;">
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="font-size: 12px; letter-spacing: .35em; text-transform: uppercase; color: #C8A75C;">Réservation</div>
+            <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 48px; color: #F4EDDD; margin: 0;">Votre traversée temporelle</h1>
+            <p style="font-size: 16px; font-weight: 300; color: #9A8F7A; margin: 0; text-wrap: pretty;">Validation immédiate. Un chrononaute référent confirme votre dossier sous 24 heures.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: #9A8F7A;">Destination</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+              <sc-for list="{{ resvDestOpts }}" as="o" hint-placeholder-count="3">
+                <sc-if value="{{ o.active }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ o.onClick }}" style="text-align: left; cursor: pointer; background: rgba(200, 167, 92, .12); border: 1px solid #C8A75C; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 5px;">
+                    <span style="font-family: 'Cormorant Garamond', serif; font-size: 21px; color: #F4EDDD;">{{ o.label }}</span>
+                    <span style="font-size: 12px; color: #C8A75C;">{{ o.prix }}</span>
+                  </button>
+                </sc-if>
+                <sc-if value="{{ o.inactive }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ o.onClick }}" style="text-align: left; cursor: pointer; background: #131009; border: 1px solid #2E2820; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 5px;" style-hover="border-color: rgba(200, 167, 92, .5);">
+                    <span style="font-family: 'Cormorant Garamond', serif; font-size: 21px; color: #C9BBA0;">{{ o.label }}</span>
+                    <span style="font-size: 12px; color: #9A8F7A;">{{ o.prix }}</span>
+                  </button>
+                </sc-if>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 22px;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <label style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: #9A8F7A;">Date de départ (2026)</label>
+              <input type="date" min="2026-06-15" value="{{ resvDate }}" onChange="{{ onResvDate }}" style="background: #131009; border: 1px solid #2E2820; color: #EDE4D2; padding: 14px 16px; border-radius: 10px; font-size: 15px; color-scheme: dark;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <label style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: #9A8F7A;">Voyageurs</label>
+              <div style="display: flex; align-items: center; background: #131009; border: 1px solid #2E2820; border-radius: 10px; overflow: hidden;">
+                <button onClick="{{ paxMinus }}" style="background: none; border: none; cursor: pointer; color: #C8A75C; font-size: 20px; padding: 12px 20px;" style-hover="background: rgba(200, 167, 92, .12);">−</button>
+                <div style="flex: 1; text-align: center; font-size: 16px; color: #EDE4D2;">{{ resvPax }}</div>
+                <button onClick="{{ paxPlus }}" style="background: none; border: none; cursor: pointer; color: #C8A75C; font-size: 20px; padding: 12px 20px;" style-hover="background: rgba(200, 167, 92, .12);">+</button>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: #9A8F7A;">Classe de voyage</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <sc-for list="{{ resvClasseOpts }}" as="o" hint-placeholder-count="2">
+                <sc-if value="{{ o.active }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ o.onClick }}" style="text-align: left; cursor: pointer; background: rgba(200, 167, 92, .12); border: 1px solid #C8A75C; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 5px;">
+                    <span style="font-family: 'Cormorant Garamond', serif; font-size: 20px; color: #F4EDDD;">{{ o.label }}</span>
+                    <span style="font-size: 13px; font-weight: 300; color: #C8A75C;">{{ o.note }}</span>
+                  </button>
+                </sc-if>
+                <sc-if value="{{ o.inactive }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ o.onClick }}" style="text-align: left; cursor: pointer; background: #131009; border: 1px solid #2E2820; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 5px;" style-hover="border-color: rgba(200, 167, 92, .5);">
+                    <span style="font-family: 'Cormorant Garamond', serif; font-size: 20px; color: #C9BBA0;">{{ o.label }}</span>
+                    <span style="font-size: 13px; font-weight: 300; color: #9A8F7A;">{{ o.note }}</span>
+                  </button>
+                </sc-if>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 22px;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <label style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: #9A8F7A;">Nom complet</label>
+              <input type="text" placeholder="Amélie Verne" value="{{ resvNom }}" onChange="{{ onResvNom }}" style="background: #131009; border: 1px solid #2E2820; color: #EDE4D2; padding: 14px 16px; border-radius: 10px; font-size: 15px;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <label style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: #9A8F7A;">Email</label>
+              <input type="email" placeholder="amelie@exemple.fr" value="{{ resvEmail }}" onChange="{{ onResvEmail }}" style="background: #131009; border: 1px solid #2E2820; color: #EDE4D2; padding: 14px 16px; border-radius: 10px; font-size: 15px;">
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid rgba(200, 167, 92, .18); padding-top: 26px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: #9A8F7A;">Estimation totale</span>
+              <span style="font-family: 'Cormorant Garamond', serif; font-size: 34px; color: #E8D5A4;">{{ resvTotal }}</span>
+            </div>
+            <button onClick="{{ submitResv }}" style="background: #C8A75C; color: #0B0908; border: none; cursor: pointer; padding: 17px 38px; border-radius: 99px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500;" style-hover="background: #E8D5A4;">Confirmer la traversée</button>
+          </div>
+          <sc-if value="{{ hasResvErr }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size: 14px; color: #D08770;">{{ resvErr }}</div>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{ resvDoneVisible }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; animation: ttFadeUp .7s ease both;">
+          <div style="width: 92px; height: 92px; border-radius: 50%; border: 1px solid #C8A75C; background: rgba(200, 167, 92, .1); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 40px; color: #E8D5A4;">⧗</div>
+          <h1 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 46px; color: #F4EDDD; margin: 0;">Traversée confirmée</h1>
+          <div style="font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: #C8A75C;">Dossier {{ cRef }}</div>
+          <div style="width: 100%; max-width: 480px; background: #131009; border: 1px solid rgba(200, 167, 92, .2); border-radius: 16px; padding: 30px; display: flex; flex-direction: column; gap: 14px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="font-size: 13px; color: #9A8F7A;">Voyageur</span><span style="font-size: 14px; color: #EDE4D2;">{{ cNom }}</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="font-size: 13px; color: #9A8F7A;">Destination</span><span style="font-size: 14px; color: #EDE4D2;">{{ cDest }}</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="font-size: 13px; color: #9A8F7A;">Départ</span><span style="font-size: 14px; color: #EDE4D2;">{{ cDate }}</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="font-size: 13px; color: #9A8F7A;">Voyageurs</span><span style="font-size: 14px; color: #EDE4D2;">{{ cPax }}</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="font-size: 13px; color: #9A8F7A;">Classe</span><span style="font-size: 14px; color: #EDE4D2;">{{ cClasse }}</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid rgba(200, 167, 92, .18); padding-top: 14px;"><span style="font-size: 13px; color: #9A8F7A;">Total</span><span style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #E8D5A4;">{{ cTotal }}</span></div>
+          </div>
+          <p style="font-size: 14px; font-weight: 300; line-height: 1.7; color: #9A8F7A; max-width: 440px; margin: 0; text-wrap: pretty;">Votre chrononaute référent vous contactera sous 24 h pour la préparation d'époque : garde-robe, monnaie, usages et vaccins temporels.</p>
+          <div style="display: flex; gap: 14px; margin-top: 6px;">
+            <button onClick="{{ goHome }}" style="background: #C8A75C; color: #0B0908; border: none; cursor: pointer; padding: 14px 30px; border-radius: 99px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500;" style-hover="background: #E8D5A4;">Retour à l'agence</button>
+            <button onClick="{{ newResv }}" style="background: transparent; color: #C9BBA0; border: 1px solid #2E2820; cursor: pointer; padding: 14px 30px; border-radius: 99px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase;" style-hover="border-color: rgba(200, 167, 92, .5); color: #E8D5A4;">Nouvelle réservation</button>
+          </div>
+        </div>
+      </sc-if>
+    </main>
+  </sc-if>
+
+  <!-- ===== FOOTER ===== -->
+  <footer style="border-top: 1px solid rgba(200, 167, 92, .12);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 56px 36px 40px 36px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;">
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-family: 'Cormorant Garamond', serif; font-size: 20px; color: #C8A75C;">⧗</span>
+          <span style="font-size: 12px; letter-spacing: .3em; text-transform: uppercase;">TimeTravel <span style="color: #C8A75C;">Agency</span></span>
+        </div>
+        <p style="font-size: 13px; font-weight: 300; line-height: 1.7; color: #6E6452; margin: 0; max-width: 380px; text-wrap: pretty;">Agence de voyage temporel de luxe — fictive. Projet pédagogique M1/M2 IA, Session 2 : Webapp &amp; Agents IA.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: #9A8F7A;">Destinations</div>
+        <button onClick="{{ goParis }}" style="background: none; border: none; cursor: pointer; color: #B8AD96; font-size: 14px; font-weight: 300; text-align: left; padding: 0;" style-hover="color: #E8D5A4;">Paris 1889</button>
+        <button onClick="{{ goCretace }}" style="background: none; border: none; cursor: pointer; color: #B8AD96; font-size: 14px; font-weight: 300; text-align: left; padding: 0;" style-hover="color: #E8D5A4;">Crétacé −65M</button>
+        <button onClick="{{ goFlorence }}" style="background: none; border: none; cursor: pointer; color: #B8AD96; font-size: 14px; font-weight: 300; text-align: left; padding: 0;" style-hover="color: #E8D5A4;">Florence 1504</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: #9A8F7A;">Agence</div>
+        <button onClick="{{ goReserver }}" style="background: none; border: none; cursor: pointer; color: #B8AD96; font-size: 14px; font-weight: 300; text-align: left; padding: 0;" style-hover="color: #E8D5A4;">Réserver</button>
+        <button onClick="{{ openQuiz }}" style="background: none; border: none; cursor: pointer; color: #B8AD96; font-size: 14px; font-weight: 300; text-align: left; padding: 0;" style-hover="color: #E8D5A4;">L'oracle de Chronos</button>
+        <button onClick="{{ openChat }}" style="background: none; border: none; cursor: pointer; color: #B8AD96; font-size: 14px; font-weight: 300; text-align: left; padding: 0;" style-hover="color: #E8D5A4;">Parler à Chronos</button>
+      </div>
+    </div>
+    <div style="max-width: 1180px; margin: 0 auto; padding: 0 36px 36px 36px; font-size: 12px; font-weight: 300; color: #564E3F;">© 2026 TimeTravel Agency. L'agence décline toute responsabilité en cas de paradoxe causé par le non-respect du protocole de non-interférence.</div>
+  </footer>
+
+  <!-- ===== QUIZ / ORACLE ===== -->
+  <sc-if value="{{ quizOpen }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Oracle (quiz)" style="position: fixed; inset: 0; z-index: 240; background: rgba(5, 4, 3, .82); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: 24px; animation: ttFadeIn .3s ease both;">
+      <div style="width: 100%; max-width: 620px; background: #12100B; border: 1px solid rgba(200, 167, 92, .3); border-radius: 20px; padding: 44px; position: relative;">
+        <button onClick="{{ closeQuiz }}" style="position: absolute; top: 18px; right: 22px; background: none; border: none; cursor: pointer; color: #9A8F7A; font-size: 22px; line-height: 1;" style-hover="color: #E8D5A4;">×</button>
+        <sc-if value="{{ quizAsking }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 11px; letter-spacing: .32em; text-transform: uppercase; color: #C8A75C;">L'oracle de Chronos · {{ quizNum }} / 4</div>
+              <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 32px; color: #F4EDDD; margin: 0;">{{ quizTitle }}</h2>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <sc-for list="{{ quizOptions }}" as="o" hint-placeholder-count="3">
+                <button onClick="{{ o.onClick }}" style="text-align: left; cursor: pointer; background: #181410; border: 1px solid #2E2820; border-radius: 12px; padding: 18px 22px; color: #D8CCB2; font-size: 16px; font-weight: 300; transition: border-color .25s ease, background .25s ease;" style-hover="border-color: #C8A75C; background: rgba(200, 167, 92, .08); color: #F4EDDD;">{{ o.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ quizBusy }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; padding: 30px 0;">
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 38px; color: #C8A75C; animation: ttBlink 1.4s infinite;">⧗</div>
+            <div style="font-size: 15px; font-weight: 300; color: #9A8F7A;">L'oracle consulte les archives temporelles…</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ quizDone }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; animation: ttFadeUp .6s ease both;">
+            <div style="font-size: 11px; letter-spacing: .32em; text-transform: uppercase; color: #C8A75C;">L'oracle a parlé</div>
+            <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 42px; color: #F4EDDD; margin: 0;">{{ quizResTitle }}</h2>
+            <p style="font-size: 16px; font-weight: 300; line-height: 1.75; color: #B8AD96; margin: 0; text-wrap: pretty;">{{ quizResText }}</p>
+            <div style="display: flex; gap: 14px; margin-top: 10px;">
+              <button onClick="{{ quizResGo }}" style="background: #C8A75C; color: #0B0908; border: none; cursor: pointer; padding: 14px 30px; border-radius: 99px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; font-weight: 500;" style-hover="background: #E8D5A4;">Explorer cette époque</button>
+              <button onClick="{{ restartQuiz }}" style="background: transparent; color: #C9BBA0; border: 1px solid #2E2820; cursor: pointer; padding: 14px 30px; border-radius: 99px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase;" style-hover="border-color: rgba(200, 167, 92, .5); color: #E8D5A4;">Recommencer</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== CHAT CHRONOS ===== -->
+  <sc-if value="{{ chatOpen }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Chat Chronos" style="position: fixed; bottom: 104px; right: 24px; z-index: 250; width: min(390px, calc(100vw - 40px)); height: min(560px, calc(100vh - 150px)); background: #12100B; border: 1px solid rgba(200, 167, 92, .3); border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 70px rgba(0, 0, 0, .6); animation: ttFadeUp .35s ease both;">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid rgba(200, 167, 92, .18); background: rgba(200, 167, 92, .05);">
+        <div style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid #C8A75C; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 19px; color: #E8D5A4;">C</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <div style="font-size: 14px; color: #F4EDDD; letter-spacing: .06em;">Chronos</div>
+          <div style="font-size: 11px; color: #9A8F7A; display: flex; align-items: center; gap: 6px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #7FA86B;"></span>Concierge temporel · IA</div>
+        </div>
+      </div>
+      <div ref="{{ chatBodyRef }}" style="flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+        <sc-for list="{{ chatMsgs }}" as="m" hint-placeholder-count="1">
+          <sc-if value="{{ m.isBot }}" hint-placeholder-val="{{ true }}">
+            <div style="align-self: flex-start; max-width: 85%; background: #1B1710; border: 1px solid rgba(200, 167, 92, .16); border-radius: 4px 14px 14px 14px; padding: 12px 15px; font-size: 14px; font-weight: 300; line-height: 1.6; color: #D8CCB2; white-space: pre-line;">{{ m.text }}</div>
+          </sc-if>
+          <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+            <div style="align-self: flex-end; max-width: 85%; background: rgba(200, 167, 92, .16); border: 1px solid rgba(200, 167, 92, .25); border-radius: 14px 4px 14px 14px; padding: 12px 15px; font-size: 14px; line-height: 1.6; color: #F0E7D2;">{{ m.text }}</div>
+          </sc-if>
+        </sc-for>
+        <sc-if value="{{ chatBusy }}" hint-placeholder-val="{{ false }}">
+          <div style="align-self: flex-start; background: #1B1710; border: 1px solid rgba(200, 167, 92, .16); border-radius: 4px 14px 14px 14px; padding: 14px 16px; display: flex; gap: 6px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #C8A75C; animation: ttBlink 1.1s infinite;"></span>
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #C8A75C; animation: ttBlink 1.1s .18s infinite;"></span>
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #C8A75C; animation: ttBlink 1.1s .36s infinite;"></span>
+          </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ showSuggestions }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 0 18px 12px 18px;">
+          <sc-for list="{{ chatSuggestions }}" as="sg" hint-placeholder-count="3">
+            <button onClick="{{ sg.onClick }}" style="background: transparent; border: 1px solid #2E2820; color: #B8AD96; cursor: pointer; padding: 7px 13px; border-radius: 99px; font-size: 12px; font-weight: 300;" style-hover="border-color: rgba(200, 167, 92, .6); color: #E8D5A4;">{{ sg.label }}</button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="display: flex; gap: 10px; padding: 14px 16px; border-top: 1px solid rgba(200, 167, 92, .18);">
+        <input type="text" placeholder="Votre question…" value="{{ chatInput }}" onChange="{{ onChatInput }}" onKeyDown="{{ onChatKey }}" style="flex: 1; background: #181410; border: 1px solid #2E2820; color: #EDE4D2; padding: 12px 14px; border-radius: 10px; font-size: 14px; font-weight: 300; min-width: 0;">
+        <button onClick="{{ sendChatClick }}" style="background: #C8A75C; color: #0B0908; border: none; cursor: pointer; padding: 0 18px; border-radius: 10px; font-size: 13px; letter-spacing: .08em; font-weight: 500;" style-hover="background: #E8D5A4;">Envoyer</button>
+      </div>
+    </div>
+  </sc-if>
+  <button onClick="{{ toggleChat }}" style="position: fixed; bottom: 26px; right: 24px; z-index: 251; width: 60px; height: 60px; border-radius: 50%; background: #C8A75C; color: #0B0908; border: none; cursor: pointer; font-family: 'Cormorant Garamond', serif; font-size: 26px; box-shadow: 0 12px 36px rgba(200, 167, 92, .35); display: flex; align-items: center; justify-content: center; transition: transform .25s ease, background .25s ease;" style-hover="background: #E8D5A4; transform: scale(1.06);">{{ chatFabIcon }}</button>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.counterRef = React.createRef();
+    this.chatBodyRef = React.createRef();
+    this.DESTS = {
+      paris: { key: 'paris', label: 'Paris 1889', year: 1889, days: 4, prixN: 12400, prix: '12 400 €' },
+      cretace: { key: 'cretace', label: 'le Crétacé (−65M)', year: -65000000, days: 3, prixN: 24800, prix: '24 800 €' },
+      florence: { key: 'florence', label: 'Florence 1504', year: 1504, days: 4, prixN: 14900, prix: '14 900 €' }
+    };
+    this.YEARS = { home: 2026, reserver: 2026, paris: 1889, cretace: -65000000, florence: 1504 };
+    this.QUIZ = [
+      { t: "Quel type d'expérience recherchez-vous ?", o: [["Culturelle et artistique", 'florence'], ["Aventure et nature sauvage", 'cretace'], ["Élégance et mondanités", 'paris']] },
+      { t: "Votre rapport au confort ?", o: [["Grand hôtel et champagne", 'paris'], ["Bivouac d'exception, frisson garanti", 'cretace'], ["Palazzo et banquets", 'florence']] },
+      { t: "Vous préférez…", o: [["L'effervescence urbaine", 'paris'], ["La nature sans aucun témoin", 'cretace'], ["L'art et l'architecture", 'florence']] },
+      { t: "Le souvenir idéal à rapporter ?", o: [["Une vue depuis la tour Eiffel toute neuve", 'paris'], ["Le regard d'un T. rex à 400 mètres", 'cretace'], ["Le David dévoilé sous vos yeux", 'florence']] }
+    ];
+    this.CHIPS = {
+      paris: ['Expositions & pavillons', 'Gastronomie Belle Époque', 'Cabarets & mondanités', 'Sciences & inventions', 'Flânerie haussmannienne'],
+      cretace: ['Grands sauropodes', 'Canopée & flore primitive', "Affût du T. rex", 'Lagunes & ptérosaures', 'Bivouac sous les étoiles'],
+      florence: ['Ateliers des maîtres', 'Architecture & Duomo', 'Banquets toscans', 'Intrigues des Médicis', 'Collections & galeries']
+    };
+    this.FALLBACK_QUIZ = {
+      paris: "Votre goût pour l'élégance, l'effervescence et la modernité naissante désigne Paris 1889 : la Belle Époque vous attend, entre la tour de M. Eiffel et les soirées de l'Exposition Universelle.",
+      cretace: "Votre âme d'exploration réclame l'origine du monde : le Crétacé vous offrira une nature sans témoin, des géants au lever du jour et un ciel que personne n'a revu depuis 65 millions d'années.",
+      florence: "Votre sensibilité pour l'art et la beauté vous destine à Florence 1504 : le David vient d'être dévoilé, les ateliers bruissent de génie, la Renaissance vous ouvre ses portes."
+    };
+    this.SYS = "Tu es Chronos, concierge virtuel de TimeTravel Agency, agence de voyage temporel de luxe (fictive, projet étudiant M1/M2). Destinations au départ du terminal de Paris, 2026 : 1) Paris 1889, Belle Époque, Exposition Universelle, tour Eiffel toute neuve — 4 jours, 12 400 € par personne, risque paradoxal faible. 2) Le Crétacé, −65 millions d'années, dinosaures, nature primitive, escorte de stase obligatoire — 3 jours, 24 800 €, risque élevé. 3) Florence 1504, Renaissance, dévoilement du David, atelier de Léonard — 4 jours, 14 900 €, risque modéré. Inclus : champ de stase certifié, garde-robe et monnaie d'époque, assurance paradoxe, chrononaute accompagnateur. Classe Première Temporelle : +45 %. Ton : professionnel, chaleureux, passionné d'histoire, une pointe d'humour subtil sur les paradoxes. Réponds toujours en français, en 50 à 100 mots, sans markdown ni listes à puces. Invente des détails crédibles et cohérents si besoin. Quand c'est pertinent, recommande une destination et invite à utiliser la page Réservation.";
+    this.state = {
+      view: 'home',
+      jumping: false,
+      jumpOpacity: 1,
+      chatOpen: false,
+      chatBusy: false,
+      chatInput: '',
+      chatMsgs: [{ role: 'assistant', text: "Bienvenue chez TimeTravel Agency. Je suis Chronos, votre concierge temporel. Une époque vous fait rêver — ou hésitez-vous encore ?" }],
+      quizOpen: false,
+      quizStep: 0,
+      quizScores: { paris: 0, cretace: 0, florence: 0 },
+      quizAnswers: [],
+      quizBusy: false,
+      quizResult: null,
+      itin: {
+        paris: { sel: [], text: '', busy: false },
+        cretace: { sel: [], text: '', busy: false },
+        florence: { sel: [], text: '', busy: false }
+      },
+      resv: { dest: 'paris', date: '', pax: 2, classe: 'decouverte', nom: '', email: '' },
+      resvDone: null,
+      resvErr: ''
+    };
+  }
+
+  componentDidUpdate() {
+    const el = this.chatBodyRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+
+  fmtYear(y) {
+    const s = Math.abs(Math.round(y)).toLocaleString('fr-FR');
+    return (y < 0 ? '−' : '') + s;
+  }
+
+  go = (view) => {
+    if (this.state.jumping) return;
+    if (view === this.state.view) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    const from = this.YEARS[this.state.view];
+    const target = this.YEARS[view];
+    if (from === target) {
+      this.setState({ view });
+      window.scrollTo(0, 0);
+      return;
+    }
+    this.setState({ jumping: true, jumpOpacity: 1 });
+    setTimeout(() => { this.setState({ view }); window.scrollTo(0, 0); }, 420);
+    const dur = 1700;
+    const t0 = performance.now();
+    const tick = (t) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+      const y = from + (target - from) * e;
+      if (this.counterRef.current) this.counterRef.current.textContent = this.fmtYear(y);
+      if (p < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        setTimeout(() => {
+          this.setState({ jumpOpacity: 0 });
+          setTimeout(() => this.setState({ jumping: false, jumpOpacity: 1 }), 480);
+        }, 320);
+      }
+    };
+    requestAnimationFrame(tick);
+  }
+
+  async ask(input) {
+    try {
+      const r = await window.claude.complete(input);
+      const txt = (typeof r === 'string' ? r : (r && r.text) || '').trim();
+      return txt || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  sendChat = async (forced) => {
+    const text = (typeof forced === 'string' ? forced : this.state.chatInput).trim();
+    if (!text || this.state.chatBusy) return;
+    const hist = [...this.state.chatMsgs, { role: 'user', text }];
+    this.setState({ chatMsgs: hist, chatInput: '', chatBusy: true });
+    const transcript = hist.map(m => (m.role === 'user' ? 'Client : ' : 'Chronos : ') + m.text).join('\n');
+    const prompt = this.SYS + "\n\nVoici la conversation en cours :\n" + transcript + "\n\nRéponds au dernier message du client, en tant que Chronos, directement, sans préfixe « Chronos : ».";
+    let reply = await this.ask(prompt);
+    if (!reply) reply = "Ma liaison temporelle est momentanément brouillée — reposez-moi votre question dans un instant. En attendant, nos trois époques vous tendent les bras : Paris 1889, le Crétacé et Florence 1504.";
+    this.setState({ chatMsgs: [...hist, { role: 'assistant', text: reply }], chatBusy: false });
+  }
+
+  answerQuiz = (dest, label) => {
+    const scores = { ...this.state.quizScores };
+    scores[dest] = (scores[dest] || 0) + 1;
+    const answers = [...this.state.quizAnswers, label];
+    if (this.state.quizStep < this.QUIZ.length - 1) {
+      this.setState({ quizScores: scores, quizAnswers: answers, quizStep: this.state.quizStep + 1 });
+    } else {
+      this.finishQuiz(scores, answers);
+    }
+  }
+
+  async finishQuiz(scores, answers) {
+    const winner = ['paris', 'florence', 'cretace'].sort((a, b) => (scores[b] || 0) - (scores[a] || 0))[0];
+    this.setState({ quizScores: scores, quizAnswers: answers, quizBusy: true });
+    const d = this.DESTS[winner];
+    const prompt = "Tu es Chronos, concierge de TimeTravel Agency, agence de voyage temporel de luxe (fictive). Un client a répondu à notre quiz : " + answers.join(' · ') + ". Sa destination recommandée est " + d.label + ". En 55 à 75 mots, en français, ton luxe sobre et chaleureux, explique-lui pourquoi cette époque est faite pour lui, en t'appuyant sur ses réponses. Commence directement, sans markdown ni guillemets.";
+    let text = await this.ask(prompt);
+    if (!text) text = this.FALLBACK_QUIZ[winner];
+    this.setState({ quizBusy: false, quizResult: { dest: winner, text } });
+  }
+
+  toggleChip = (key, label) => {
+    const it = this.state.itin[key];
+    const sel = it.sel.includes(label) ? it.sel.filter(l => l !== label) : [...it.sel, label];
+    this.patchItin(key, { sel });
+  }
+
+  patchItin(key, patch) {
+    this.setState(s => ({ itin: { ...s.itin, [key]: { ...s.itin[key], ...patch } } }));
+  }
+
+  genItin = async (key) => {
+    const it = this.state.itin[key];
+    if (it.busy) return;
+    const d = this.DESTS[key];
+    const sel = it.sel.length ? it.sel.join(', ') : "découverte générale de l'époque";
+    this.patchItin(key, { busy: true, text: '' });
+    const prompt = "Tu es Chronos, concierge de TimeTravel Agency, agence de voyage temporel de luxe (fictive). Compose un itinéraire de " + d.days + " jours à destination de " + d.label + " pour un voyageur intéressé par : " + sel + ". Réponds en français, sans markdown, format strict : une ligne par jour sous la forme « Jour N — Titre évocateur : deux phrases élégantes et concrètes. » Reste crédible historiquement (ou scientifiquement pour le Crétacé), ton luxe sobre, aucune introduction ni conclusion.";
+    let text = await this.ask(prompt);
+    if (!text) text = "La liaison avec nos archives temporelles est interrompue. Réessayez dans un instant — Chronos vous prie de l'excuser.";
+    this.patchItin(key, { busy: false, text });
+  }
+
+  patchResv(patch) {
+    this.setState(s => ({ resv: { ...s.resv, ...patch }, resvErr: '' }));
+  }
+
+  submitResv = () => {
+    const r = this.state.resv;
+    if (!r.nom.trim() || !r.email.includes('@') || !r.date) {
+      this.setState({ resvErr: 'Merci de compléter votre nom, un email valide et une date de départ.' });
+      return;
+    }
+    const d = this.DESTS[r.dest];
+    const mult = r.classe === 'premiere' ? 1.45 : 1;
+    const total = Math.round(d.prixN * r.pax * mult);
+    const refCode = 'TT-' + (r.dest === 'cretace' ? 'K65M' : Math.abs(d.year)) + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+    let dateFr = r.date;
+    try {
+      dateFr = new Date(r.date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    } catch (e) {}
+    this.setState({
+      resvErr: '',
+      resvDone: {
+        ref: refCode,
+        nom: r.nom.trim(),
+        dest: r.dest === 'cretace' ? 'Le Crétacé · −65 000 000' : d.label,
+        date: dateFr,
+        pax: r.pax + (r.pax > 1 ? ' voyageurs' : ' voyageur'),
+        classe: r.classe === 'premiere' ? 'Première Temporelle' : 'Classe Découverte',
+        total: total.toLocaleString('fr-FR') + ' €'
+      }
+    });
+    window.scrollTo(0, 0);
+  }
+
+  chipList(key) {
+    const it = this.state.itin[key];
+    return this.CHIPS[key].map(label => ({
+      label,
+      active: it.sel.includes(label),
+      inactive: !it.sel.includes(label),
+      onClick: () => this.toggleChip(key, label)
+    }));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const q = this.QUIZ[s.quizStep];
+    const r = s.resv;
+    const d = this.DESTS[r.dest];
+    const mult = r.classe === 'premiere' ? 1.45 : 1;
+    const total = Math.round(d.prixN * r.pax * mult);
+    const resDest = s.quizResult ? this.DESTS[s.quizResult.dest] : null;
+    const labels = { paris: 'Paris 1889', cretace: 'Le Crétacé', florence: 'Florence 1504' };
+    return {
+      isHome: s.view === 'home',
+      isParis: s.view === 'paris',
+      isCretace: s.view === 'cretace',
+      isFlorence: s.view === 'florence',
+      isReserver: s.view === 'reserver',
+      hudYear: this.fmtYear(this.YEARS[s.view]),
+      jumping: s.jumping,
+      jumpOpacity: s.jumpOpacity,
+      counterRef: this.counterRef,
+      goHome: () => this.go('home'),
+      goParis: () => this.go('paris'),
+      goCretace: () => this.go('cretace'),
+      goFlorence: () => this.go('florence'),
+      goReserver: () => this.go('reserver'),
+      goReserverParis: () => { this.patchResv({ dest: 'paris' }); this.go('reserver'); },
+      goReserverCretace: () => { this.patchResv({ dest: 'cretace' }); this.go('reserver'); },
+      goReserverFlorence: () => { this.patchResv({ dest: 'florence' }); this.go('reserver'); },
+      scrollToDests: () => {
+        const el = document.getElementById('tt-destinations');
+        if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+      },
+      destCards: [
+        { year: '1889', title: 'Paris, Belle Époque', teaser: "L'Exposition Universelle, la tour toute neuve de M. Eiffel et le Tout-Paris en habit de soirée.", slotId: 'card-paris', placeholder: 'Visuel — Paris 1889', onClick: () => this.go('paris') },
+        { year: '−65 000 000', title: 'Le Crétacé', teaser: 'Les derniers géants de la Terre, observés depuis nos plateformes de stase. Le safari ultime.', slotId: 'card-cretace', placeholder: 'Visuel — Crétacé', onClick: () => this.go('cretace') },
+        { year: '1504', title: 'Florence, Renaissance', teaser: "Le David vient d'être dévoilé, Léonard remplit ses carnets, la ville entière bruisse de génie.", slotId: 'card-florence', placeholder: 'Visuel — Florence 1504', onClick: () => this.go('florence') }
+      ],
+      // itinéraires IA
+      parisChips: this.chipList('paris'),
+      cretaceChips: this.chipList('cretace'),
+      florenceChips: this.chipList('florence'),
+      genItinParis: () => this.genItin('paris'),
+      genItinCretace: () => this.genItin('cretace'),
+      genItinFlorence: () => this.genItin('florence'),
+      itinParisBusy: s.itin.paris.busy,
+      itinCretaceBusy: s.itin.cretace.busy,
+      itinFlorenceBusy: s.itin.florence.busy,
+      hasItinParis: !!s.itin.paris.text,
+      hasItinCretace: !!s.itin.cretace.text,
+      hasItinFlorence: !!s.itin.florence.text,
+      itinParisText: s.itin.paris.text,
+      itinCretaceText: s.itin.cretace.text,
+      itinFlorenceText: s.itin.florence.text,
+      // quiz
+      quizOpen: s.quizOpen,
+      openQuiz: () => this.setState({ quizOpen: true, quizStep: 0, quizScores: { paris: 0, cretace: 0, florence: 0 }, quizAnswers: [], quizResult: null, quizBusy: false }),
+      closeQuiz: () => this.setState({ quizOpen: false }),
+      restartQuiz: () => this.setState({ quizStep: 0, quizScores: { paris: 0, cretace: 0, florence: 0 }, quizAnswers: [], quizResult: null, quizBusy: false }),
+      quizAsking: s.quizOpen && !s.quizBusy && !s.quizResult,
+      quizBusy: s.quizBusy,
+      quizDone: !!s.quizResult,
+      quizNum: s.quizStep + 1,
+      quizTitle: q ? q.t : '',
+      quizOptions: q ? q.o.map(([label, dest]) => ({ label, onClick: () => this.answerQuiz(dest, label) })) : [],
+      quizResTitle: resDest ? labels[resDest.key] : '',
+      quizResText: s.quizResult ? s.quizResult.text : '',
+      quizResGo: () => { const dest = s.quizResult ? s.quizResult.dest : 'paris'; this.setState({ quizOpen: false }); this.go(dest); },
+      // chat
+      chatOpen: s.chatOpen,
+      toggleChat: () => this.setState({ chatOpen: !s.chatOpen }),
+      openChat: () => this.setState({ chatOpen: true }),
+      chatFabIcon: s.chatOpen ? '×' : 'C',
+      chatBodyRef: this.chatBodyRef,
+      chatMsgs: s.chatMsgs.map(m => ({ text: m.text, isBot: m.role !== 'user', isUser: m.role === 'user' })),
+      chatBusy: s.chatBusy,
+      chatInput: s.chatInput,
+      onChatInput: (e) => this.setState({ chatInput: e.target.value }),
+      onChatKey: (e) => { if (e.key === 'Enter') this.sendChat(); },
+      sendChatClick: () => this.sendChat(),
+      showSuggestions: s.chatMsgs.length <= 1 && !s.chatBusy,
+      chatSuggestions: [
+        'Quelle destination pour une lune de miel ?',
+        'Le Crétacé est-il vraiment sûr ?',
+        "Que comprend le prix ?"
+      ].map(label => ({ label, onClick: () => this.sendChat(label) })),
+      // réservation
+      resvFormVisible: !s.resvDone,
+      resvDoneVisible: !!s.resvDone,
+      resvDestOpts: ['paris', 'cretace', 'florence'].map(k => ({
+        label: labels[k],
+        prix: this.DESTS[k].prix + ' / pers.',
+        active: r.dest === k,
+        inactive: r.dest !== k,
+        onClick: () => this.patchResv({ dest: k })
+      })),
+      resvClasseOpts: [
+        { key: 'decouverte', label: 'Classe Découverte', note: 'Tarif standard · tout inclus' },
+        { key: 'premiere', label: 'Première Temporelle', note: '+45 % · suite de stase privée' }
+      ].map(c => ({
+        label: c.label,
+        note: c.note,
+        active: r.classe === c.key,
+        inactive: r.classe !== c.key,
+        onClick: () => this.patchResv({ classe: c.key })
+      })),
+      resvDate: r.date,
+      onResvDate: (e) => this.patchResv({ date: e.target.value }),
+      resvPax: r.pax,
+      paxMinus: () => this.patchResv({ pax: Math.max(1, r.pax - 1) }),
+      paxPlus: () => this.patchResv({ pax: Math.min(8, r.pax + 1) }),
+      resvNom: r.nom,
+      onResvNom: (e) => this.patchResv({ nom: e.target.value }),
+      resvEmail: r.email,
+      onResvEmail: (e) => this.patchResv({ email: e.target.value }),
+      resvTotal: total.toLocaleString('fr-FR') + ' €',
+      submitResv: this.submitResv,
+      hasResvErr: !!s.resvErr,
+      resvErr: s.resvErr,
+      newResv: () => this.setState({ resvDone: null, resv: { ...r, nom: '', email: '', date: '' } }),
+      // confirmation
+      cRef: s.resvDone ? s.resvDone.ref : '',
+      cNom: s.resvDone ? s.resvDone.nom : '',
+      cDest: s.resvDone ? s.resvDone.dest : '',
+      cDate: s.resvDone ? s.resvDone.date : '',
+      cPax: s.resvDone ? s.resvDone.pax : '',
+      cClasse: s.resvDone ? s.resvDone.classe : '',
+      cTotal: s.resvDone ? s.resvDone.total : ''
+    };
+  }
+}
+</script>
+</body>
+</html>
