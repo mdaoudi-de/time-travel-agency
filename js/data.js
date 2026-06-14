@@ -87,7 +87,7 @@
     'Que comprend le prix ?'
   ];
 
-  var CHAT_LOCAL_HINT = "\n\n(Je vous réponds en mode local. Pour activer l'IA générative Mistral, ajoutez votre clé gratuite via l'icône ⚙ ci-dessus.)";
+  var CHAT_LOCAL_HINT = "\n\n(Réponses en mode local — l'IA générative Mistral n'est pas configurée.)";
 
   /* ---------- Textes de secours : quiz ---------- */
   var FALLBACK_QUIZ = {

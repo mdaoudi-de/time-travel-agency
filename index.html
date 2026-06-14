@@ -35,6 +35,8 @@
 
   <!-- Scripts (defer = exécution dans l'ordre, après le parsing du DOM) -->
   <script defer src="js/data.js"></script>
+  <!-- Clé Mistral optionnelle (fichier ignoré par git). Absent = mode local. -->
+  <script defer src="js/config.local.js"></script>
   <script defer src="js/ai.js"></script>
   <script defer src="js/chat.js"></script>
   <script defer src="js/quiz.js"></script>
@@ -533,19 +535,7 @@
         <div class="chat__name">Chronos</div>
         <div class="chat__mode"><span class="chat__mode-dot" aria-hidden="true"></span><span id="chat-mode">Concierge temporel · mode local</span></div>
       </div>
-      <button class="chat__gear" id="chat-gear" aria-label="Réglages (clé IA)" aria-expanded="false">⚙</button>
       <button class="chat__close" data-action="close-chat" aria-label="Fermer le chat">×</button>
-    </div>
-
-    <!-- Réglages clé Mistral -->
-    <div class="chat__settings" id="chat-settings" hidden>
-      <div class="chat__settings-title">Clé API Mistral</div>
-      <div class="chat__settings-row">
-        <input class="input" type="password" id="chat-key-input" placeholder="Collez votre clé…" autocomplete="off">
-        <button class="chat__send" type="button" id="chat-key-save">OK</button>
-      </div>
-      <div class="chat__settings-status" id="chat-key-status"></div>
-      <p class="chat__settings-note">Votre clé reste dans votre navigateur (localStorage) et n'est envoyée qu'à <strong>api.mistral.ai</strong>. Clé gratuite : <a href="https://console.mistral.ai/" target="_blank" rel="noopener">console.mistral.ai</a>. <button type="button" id="chat-key-clear" class="footer-link" style="display:inline;font-size:11px;text-transform:uppercase;letter-spacing:.1em">Effacer</button></p>
     </div>
 
     <div class="chat__body" id="chat-body" aria-live="polite"></div>

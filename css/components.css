@@ -485,19 +485,8 @@ input[type="date"].input { color-scheme: dark; }
 }
 .chat__mode-dot { width: 5px; height: 5px; border-radius: 50%; background: #7FA86B; flex: none; }
 
-.chat__gear {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 17px;
-  padding: 6px;
-  line-height: 1;
-  transition: color .25s ease, transform .35s ease;
-}
-.chat__gear:hover { color: var(--gold-2); transform: rotate(45deg); }
-
 .chat__close {
+  margin-left: auto;
   background: none;
   border: none;
   color: var(--muted);
@@ -507,24 +496,6 @@ input[type="date"].input { color-scheme: dark; }
   transition: color .25s ease;
 }
 .chat__close:hover { color: var(--gold-2); }
-
-/* Panneau réglages (clé API Mistral) */
-.chat__settings {
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--gold-a18);
-  background: var(--bg-3);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.chat__settings-title { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
-.chat__settings-row { display: flex; gap: 8px; }
-.chat__settings-row .input { padding: 10px 12px; font-size: 13px; }
-.chat__settings-note { font-size: 11px; font-weight: 300; line-height: 1.55; color: var(--muted); }
-.chat__settings-note a { color: var(--gold); text-decoration: none; }
-.chat__settings-note a:hover { text-decoration: underline; }
-.chat__settings-status { font-size: 12px; color: var(--gold-2); min-height: 14px; }
-.chat__settings-status.is-error { color: var(--error); }
 
 .chat__body {
   flex: 1;

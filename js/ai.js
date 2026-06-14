@@ -11,26 +11,16 @@
   window.TT = window.TT || {};
   var D = TT.data;
 
-  var KEY_STORE = 'tt.mistralKey';
   var ENDPOINT = 'https://api.mistral.ai/v1/chat/completions';
   var MODEL = 'mistral-small-latest';
-  var memKey = '';          // secours si localStorage indisponible (navigation privée)
+  var PLACEHOLDER = 'COLLEZ_VOTRE_CLE_MISTRAL_ICI';
   var defaultIdx = 0;       // rotation des réponses par défaut
 
-  /* ---------- Gestion de la clé ---------- */
+  /* ---------- Clé : lue depuis js/config.local.js (window.TT_CONFIG) ---------- */
   function getKey() {
-    if (memKey) return memKey;
-    try { return localStorage.getItem(KEY_STORE) || ''; }
-    catch (e) { return ''; }
-  }
-  function setKey(k) {
-    memKey = (k || '').trim();
-    try { if (memKey) localStorage.setItem(KEY_STORE, memKey); }
-    catch (e) { /* stockage indisponible : on garde en mémoire */ }
-  }
-  function clearKey() {
-    memKey = '';
-    try { localStorage.removeItem(KEY_STORE); } catch (e) {}
+    var cfg = window.TT_CONFIG;
+    var k = (cfg && typeof cfg.mistralKey === 'string') ? cfg.mistralKey.trim() : '';
+    return k === PLACEHOLDER ? '' : k;
   }
   function hasKey() { return !!getKey(); }
 
@@ -177,17 +167,9 @@
     });
   }
 
-  /* Test rapide de validité de clé (panneau réglages) */
-  function verifyKey() {
-    return complete(
-      [{ role: 'user', content: 'Réponds simplement « ok ».' }],
-      { temperature: 0, maxTokens: 5 }
-    );
-  }
-
   TT.ai = {
-    getKey: getKey, setKey: setKey, clearKey: clearKey, hasKey: hasKey,
-    complete: complete, verifyKey: verifyKey,
+    getKey: getKey, hasKey: hasKey,
+    complete: complete,
     localAnswer: localAnswer, localItinerary: localItinerary,
     chatReply: chatReply, quizReply: quizReply, itinReply: itinReply
   };

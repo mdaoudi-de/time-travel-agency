@@ -6,4 +6,8 @@ services:
     # Hôte 8090 (8080 souvent déjà pris) -> 80 dans le conteneur. Ajuste à gauche si besoin.
     ports:
       - "8090:80"
+    # La clé est montée en lecture seule : éditez js/config.local.js puis rafraîchissez
+    # le navigateur (pas besoin de reconstruire l'image).
+    volumes:
+      - ./js/config.local.js:/usr/share/nginx/html/js/config.local.js:ro
     restart: unless-stopped

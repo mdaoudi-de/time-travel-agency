@@ -1,7 +1,8 @@
 /* ============================================================
    TimeTravel Agency — chat.js
    Widget « Chronos » : ouverture, bulles, suggestions,
-   panneau de clé Mistral, badge de mode (transparence IA).
+   badge de mode (transparence IA). La clé Mistral est lue depuis
+   js/config.local.js (pas de saisie utilisateur).
    ============================================================ */
 (function () {
   'use strict';
@@ -19,12 +20,6 @@
     els.fab = $('chat-fab');
     els.panel = $('chat');
     els.mode = $('chat-mode');
-    els.gear = $('chat-gear');
-    els.settings = $('chat-settings');
-    els.keyInput = $('chat-key-input');
-    els.keySave = $('chat-key-save');
-    els.keyClear = $('chat-key-clear');
-    els.keyStatus = $('chat-key-status');
     els.body = $('chat-body');
     els.suggestions = $('chat-suggestions');
     els.input = $('chat-input');
@@ -38,10 +33,6 @@
     updateMode();
 
     els.fab.addEventListener('click', toggle);
-    els.gear.addEventListener('click', toggleSettings);
-    els.keySave.addEventListener('click', saveKey);
-    els.keyClear.addEventListener('click', clearKey);
-    els.keyInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); saveKey(); } });
     els.send.addEventListener('click', function () { send(); });
     els.input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); send(); } });
     els.panel.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); close(); } });
@@ -63,36 +54,6 @@
   }
   function toggle() { els.panel.hidden ? open() : close(); }
 
-  /* ---------- Réglages clé ---------- */
-  function toggleSettings() {
-    var willOpen = els.settings.hidden;
-    els.settings.hidden = !willOpen;
-    els.gear.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-    if (willOpen) { els.keyInput.value = ''; els.keyInput.focus(); }
-  }
-  function setStatus(msg, isError) {
-    els.keyStatus.textContent = msg || '';
-    els.keyStatus.classList.toggle('is-error', !!isError);
-  }
-  function saveKey() {
-    var k = els.keyInput.value.trim();
-    if (!k) { setStatus('Saisissez une clé.', true); return; }
-    TT.ai.setKey(k);
-    updateMode();
-    setStatus('Vérification…', false);
-    TT.ai.verifyKey().then(function (r) {
-      if (r.ok) { setStatus('Clé valide — IA Mistral activée ✓', false); els.keyInput.value = ''; }
-      else if (r.reason === 'auth') { setStatus('Clé invalide ou expirée.', true); }
-      else if (r.reason === 'rate') { setStatus('Quota atteint, réessayez plus tard.', true); }
-      else if (r.reason === 'timeout') { setStatus('Délai dépassé — clé enregistrée tout de même.', false); }
-      else { setStatus('Connexion impossible — clé enregistrée tout de même.', false); }
-    });
-  }
-  function clearKey() {
-    TT.ai.clearKey();
-    updateMode();
-    setStatus('Clé effacée — retour au mode local.', false);
-  }
   function updateMode() {
     els.mode.textContent = TT.ai.hasKey()
       ? 'Concierge temporel · IA Mistral'
