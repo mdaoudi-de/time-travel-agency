@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    image: timetravel-agency
+    container_name: timetravel-agency
+    # Hôte 8090 (8080 souvent déjà pris) -> 80 dans le conteneur. Ajuste à gauche si besoin.
+    ports:
+      - "8090:80"
+    restart: unless-stopped

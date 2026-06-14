@@ -162,6 +162,16 @@ Le projet est prêt à être déployé tel quel (statique). Au choix :
 - **Netlify** — glissez-déposez le dossier sur [app.netlify.com/drop](https://app.netlify.com/drop).
 - **GitHub Pages** — poussez le dépôt puis activez Pages sur la branche `main` (dossier racine).
 - **Vercel** — « Import Project », aucun réglage de build (framework : *Other*).
+- **Docker** — image nginx prête à l'emploi (voir `Dockerfile`) :
+
+```bash
+docker compose up --build          # → http://localhost:8080
+# ou, sans compose :
+docker build -t timetravel-agency .
+docker run --rm -p 8080:80 timetravel-agency
+```
+
+  L'image (~74 Mo, `nginx:alpine`) ne contient que le site (pas de `legacy/`, `notes/`, `uploads/`) et n'embarque aucun secret — la clé Mistral est saisie côté navigateur. Déployable sur tout hébergeur de conteneurs (Render, Railway, Fly.io, Google Cloud Run…).
 
 Après déploiement : testez l'URL sur mobile et desktop, vérifiez le chat, le quiz, les itinéraires et la réservation, puis collez l'URL en haut de ce README.
 

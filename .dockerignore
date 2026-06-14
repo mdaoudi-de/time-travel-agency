@@ -1,0 +1,10 @@
+.git
+.gitignore
+legacy/
+notes/
+uploads/
+*.md
+LICENSE
+Dockerfile
+.dockerignore
+docker-compose.yml
