@@ -487,24 +487,31 @@ input[type="date"].input { color-scheme: dark; }
 
 .chat__gear {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
   background: none;
   border: none;
   color: var(--muted);
-  font-size: 17px;
-  line-height: 1;
-  padding: 4px 6px;
-  transition: color .25s ease;
+  transition: color .25s ease, transform .4s ease;
 }
 .chat__gear:hover,
 .chat__gear[aria-expanded="true"] { color: var(--gold-2); }
+.chat__gear[aria-expanded="true"] { transform: rotate(45deg); }
 
 .chat__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
   background: none;
   border: none;
   color: var(--muted);
   font-size: 22px;
   line-height: 1;
-  padding: 4px 6px;
   transition: color .25s ease;
 }
 .chat__close:hover { color: var(--gold-2); }
