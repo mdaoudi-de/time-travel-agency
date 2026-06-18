@@ -83,9 +83,13 @@ Toutes les fonctions IA passent par `js/ai.js`, qui tente d'abord l'**API Mistra
 
 L'IA générative est **optionnelle** (le mode local suffit à la démo), mais recommandée pour des réponses « vraie IA ».
 
-1. Créez une clé **gratuite** sur [console.mistral.ai](https://console.mistral.ai/).
-2. Ouvrez le chat (bouton **C** en bas à droite) → icône **⚙** → collez la clé → **OK**.
-3. Le badge passe de « mode local » à « **IA Mistral** ». Le modèle utilisé est `mistral-small-latest`.
+Créez une clé **gratuite** sur [console.mistral.ai](https://console.mistral.ai/), puis activez l'IA par l'une des deux méthodes :
+
+**Méthode 1 — depuis l'interface (recommandée).** Ouvrez le chat (bouton **C** en bas à droite) → icône **⚙** → collez la clé → **Enregistrer**. La clé est mémorisée dans votre navigateur (`localStorage`). Le bouton **Effacer** la supprime.
+
+**Méthode 2 — clé par défaut (fichier).** Copiez `js/config.example.js` en `js/config.local.js` et renseignez `mistralKey`. Pratique pour pré-remplir une démo. Ce fichier est ignoré par git.
+
+> La clé saisie dans l'interface **prime** sur celle du fichier. Dans les deux cas, le badge passe de « mode local » à « **IA Mistral** ». Le modèle utilisé est `mistral-small-latest`.
 
 > 🔒 **Sécurité & transparence.** La clé reste dans votre navigateur (`localStorage`) et n'est envoyée qu'à `api.mistral.ai`. Elle **n'est jamais committée** dans le dépôt (voir `.gitignore`). Ne partagez pas une clé dans le code source.
 

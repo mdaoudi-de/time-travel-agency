@@ -14,15 +14,36 @@
   var ENDPOINT = 'https://api.mistral.ai/v1/chat/completions';
   var MODEL = 'mistral-small-latest';
   var PLACEHOLDER = 'COLLEZ_VOTRE_CLE_MISTRAL_ICI';
+  var LS_KEY = 'tt_mistral_key';   // clé saisie par l'utilisateur (navigateur)
   var defaultIdx = 0;       // rotation des réponses par défaut
 
-  /* ---------- Clé : lue depuis js/config.local.js (window.TT_CONFIG) ---------- */
-  function getKey() {
-    var cfg = window.TT_CONFIG;
-    var k = (cfg && typeof cfg.mistralKey === 'string') ? cfg.mistralKey.trim() : '';
+  /* ---------- Clé ----------
+     Priorité : clé saisie dans l'interface (localStorage)
+     puis valeur par défaut de js/config.local.js (window.TT_CONFIG).
+     La clé n'est jamais committée et n'est envoyée qu'à api.mistral.ai. */
+  function clean(k) {
+    k = (typeof k === 'string') ? k.trim() : '';
     return k === PLACEHOLDER ? '' : k;
   }
+  function storedKey() {
+    try { return clean(localStorage.getItem(LS_KEY)); } catch (e) { return ''; }
+  }
+  function getKey() {
+    var k = storedKey();
+    if (k) return k;
+    var cfg = window.TT_CONFIG;
+    return clean(cfg && cfg.mistralKey);
+  }
   function hasKey() { return !!getKey(); }
+  function setKey(k) {
+    k = clean(k);
+    try {
+      if (k) localStorage.setItem(LS_KEY, k);
+      else localStorage.removeItem(LS_KEY);
+    } catch (e) {}
+    return k;
+  }
+  function clearKey() { setKey(''); }
 
   /* ---------- Appel Mistral bas niveau ---------- */
   function complete(messages, opts) {
@@ -168,7 +189,7 @@
   }
 
   TT.ai = {
-    getKey: getKey, hasKey: hasKey,
+    getKey: getKey, hasKey: hasKey, setKey: setKey, clearKey: clearKey,
     complete: complete,
     localAnswer: localAnswer, localItinerary: localItinerary,
     chatReply: chatReply, quizReply: quizReply, itinReply: itinReply

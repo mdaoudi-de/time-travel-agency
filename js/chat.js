@@ -1,8 +1,9 @@
 /* ============================================================
    TimeTravel Agency — chat.js
    Widget « Chronos » : ouverture, bulles, suggestions,
-   badge de mode (transparence IA). La clé Mistral est lue depuis
-   js/config.local.js (pas de saisie utilisateur).
+   badge de mode (transparence IA). La clé Mistral se saisit via le
+   bouton ⚙ (stockée dans le navigateur) ou par défaut depuis
+   js/config.local.js.
    ============================================================ */
 (function () {
   'use strict';
@@ -24,6 +25,11 @@
     els.suggestions = $('chat-suggestions');
     els.input = $('chat-input');
     els.send = $('chat-send');
+    els.settingsBtn = $('chat-settings-btn');
+    els.settings = $('chat-settings');
+    els.key = $('chat-key');
+    els.keySave = $('chat-key-save');
+    els.keyClear = $('chat-key-clear');
     if (!els.panel) return;
 
     // Message d'accueil
@@ -36,6 +42,35 @@
     els.send.addEventListener('click', function () { send(); });
     els.input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); send(); } });
     els.panel.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); close(); } });
+
+    els.settingsBtn.addEventListener('click', toggleSettings);
+    els.keySave.addEventListener('click', saveKey);
+    els.keyClear.addEventListener('click', clearKey);
+    els.key.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); saveKey(); } });
+  }
+
+  /* ---------- Réglages : clé Mistral ---------- */
+  function toggleSettings() {
+    var show = els.settings.hidden;
+    els.settings.hidden = !show;
+    els.settingsBtn.setAttribute('aria-expanded', String(show));
+    if (show) {
+      els.key.value = TT.ai.getKey();
+      setTimeout(function () { els.key.focus(); }, 50);
+    }
+  }
+  function saveKey() {
+    TT.ai.setKey(els.key.value);
+    els.settings.hidden = true;
+    els.settingsBtn.setAttribute('aria-expanded', 'false');
+    localHintShown = false;
+    updateMode();
+  }
+  function clearKey() {
+    TT.ai.clearKey();
+    els.key.value = '';
+    localHintShown = false;
+    updateMode();
   }
 
   /* ---------- Ouverture / fermeture ---------- */

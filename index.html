@@ -535,7 +535,18 @@
         <div class="chat__name">Chronos</div>
         <div class="chat__mode"><span class="chat__mode-dot" aria-hidden="true"></span><span id="chat-mode">Concierge temporel · mode local</span></div>
       </div>
+      <button class="chat__gear" id="chat-settings-btn" type="button" aria-label="Configurer la clé Mistral" aria-expanded="false" title="Clé Mistral">⚙</button>
       <button class="chat__close" data-action="close-chat" aria-label="Fermer le chat">×</button>
+    </div>
+
+    <div class="chat__settings" id="chat-settings" hidden>
+      <label class="chat__settings-label" for="chat-key">Clé API Mistral</label>
+      <input class="input" type="password" id="chat-key" placeholder="Collez votre clé…" autocomplete="off" spellcheck="false">
+      <div class="chat__settings-row">
+        <button class="chat__send" id="chat-key-save" type="button">Enregistrer</button>
+        <button class="chat__key-clear" id="chat-key-clear" type="button">Effacer</button>
+      </div>
+      <p class="chat__settings-note">La clé reste dans votre navigateur et n'est envoyée qu'à api.mistral.ai. Créez-en une sur console.mistral.ai.</p>
     </div>
 
     <div class="chat__body" id="chat-body" aria-live="polite"></div>

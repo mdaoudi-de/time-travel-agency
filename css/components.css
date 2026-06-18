@@ -485,8 +485,20 @@ input[type="date"].input { color-scheme: dark; }
 }
 .chat__mode-dot { width: 5px; height: 5px; border-radius: 50%; background: #7FA86B; flex: none; }
 
-.chat__close {
+.chat__gear {
   margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1;
+  padding: 4px 6px;
+  transition: color .25s ease;
+}
+.chat__gear:hover,
+.chat__gear[aria-expanded="true"] { color: var(--gold-2); }
+
+.chat__close {
   background: none;
   border: none;
   color: var(--muted);
@@ -496,6 +508,30 @@ input[type="date"].input { color-scheme: dark; }
   transition: color .25s ease;
 }
 .chat__close:hover { color: var(--gold-2); }
+
+.chat__settings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--gold-a18);
+  background: var(--gold-a05);
+}
+.chat__settings-label { font-size: 12px; letter-spacing: .06em; color: var(--ivory-2); }
+.chat__settings-row { display: flex; gap: 8px; }
+.chat__settings-row .chat__send { flex: 1; min-height: 38px; }
+.chat__key-clear {
+  background: none;
+  border: 1px solid var(--gold-a18);
+  color: var(--muted);
+  padding: 0 14px;
+  min-height: 38px;
+  border-radius: 10px;
+  font-size: 13px;
+  transition: color .25s ease, border-color .25s ease;
+}
+.chat__key-clear:hover { color: var(--gold-2); border-color: var(--gold); }
+.chat__settings-note { font-size: 11px; line-height: 1.5; color: var(--muted); margin: 0; }
 
 .chat__body {
   flex: 1;
