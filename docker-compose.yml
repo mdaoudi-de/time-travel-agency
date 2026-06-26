@@ -10,4 +10,5 @@ services:
     # le navigateur (pas besoin de reconstruire l'image).
     volumes:
       - ./js/config.local.js:/usr/share/nginx/html/js/config.local.js:ro
+      - ./assets:/usr/share/nginx/html/assets:ro
     restart: unless-stopped

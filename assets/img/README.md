@@ -1,20 +1,19 @@
-# Visuels Session 1 — à déposer ici
+# Visuels Session 1
 
-Déposez vos 6 visuels générés en Session 1 (Midjourney / Runway / autre) dans ce dossier,
-avec **exactement** ces noms de fichiers :
+Les visuels des 3 destinations (générés en Session 1) sont placés ici.
+Le code accepte `.png`, `.jpg` ou `.webp` (essai dans cet ordre) ; à défaut, un
+placeholder élégant s'affiche automatiquement.
 
-| Fichier            | Usage                                  | Taille conseillée |
-|--------------------|----------------------------------------|-------------------|
-| `paris-hero.jpg`   | Image plein écran — page Paris 1889    | ≈ 1920 × 1080     |
-| `paris-card.jpg`   | Carte destination — page d'accueil     | ≈ 800 × 520       |
-| `cretace-hero.jpg` | Image plein écran — page Crétacé       | ≈ 1920 × 1080     |
-| `cretace-card.jpg` | Carte destination — page d'accueil     | ≈ 800 × 520       |
-| `florence-hero.jpg`| Image plein écran — page Florence 1504 | ≈ 1920 × 1080     |
-| `florence-card.jpg`| Carte destination — page d'accueil     | ≈ 800 × 520       |
+## Fichiers utilisés
 
-Notes :
-- Le format **`.webp`** est aussi accepté : si `paris-hero.jpg` est introuvable, le site
-  essaie automatiquement `paris-hero.webp`.
-- Si un fichier manque, le site affiche un **placeholder élégant** aux couleurs de la
-  destination — rien ne casse.
-- Les images sont chargées en *lazy loading* (critère performance).
+| Fichier | Usage |
+|---|---|
+| `paris-hero.png` / `cretace-hero.png` / `florence-hero.png` | Image plein écran (hero) — pages destination, format paysage (16:9) |
+| `paris-card.png` / `cretace-card.png` / `florence-card.png` | Cartes de la page d'accueil, format carré (1:1) |
+| `*-portrait.png` | Variantes portrait (9:16) — non utilisées pour l'instant, conservées au cas où |
+
+## Vidéos
+
+Les vidéos de fond des pages destination sont dans [`../video/`](../video) :
+`paris.mp4`, `cretace.mp4`, `florence.mp4` — lecture automatique, muette, en boucle,
+avec l'image hero en secours et désactivation si « animations réduites ».

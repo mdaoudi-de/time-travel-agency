@@ -147,21 +147,44 @@
 
   /* ---------- Visuels Session 1 (avec secours élégant) ---------- */
   function initImages() {
+    var EXTS = ['.png', '.jpg', '.webp']; // ordre d'essai (png d'abord : visuels Session 1)
     Array.prototype.forEach.call(document.querySelectorAll('figure.media[data-img]'), function (fig) {
       var img = fig.querySelector('img');
       if (!img) return;
       var base = 'assets/img/' + fig.getAttribute('data-img');
-      var triedWebp = false;
+      var i = 0;
       img.addEventListener('load', function () {
         img.classList.add('is-loaded');
         fig.classList.remove('media--missing');
       });
       img.addEventListener('error', function () {
-        if (!triedWebp) { triedWebp = true; img.src = base + '.webp'; return; }
+        i++;
+        if (i < EXTS.length) { img.src = base + EXTS[i]; return; }
         fig.classList.add('media--missing');
         img.style.display = 'none';
       });
-      img.src = base + '.jpg';
+      img.src = base + EXTS[0];
+    });
+  }
+
+  /* ---------- Fonds vidéo des pages destination ---------- */
+  function initHeroVideos() {
+    if (reduce) return; // prefers-reduced-motion : on garde l'image fixe
+    var vids = document.querySelectorAll('video[data-video]');
+    if (!vids.length || !('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var v = en.target;
+        if (en.isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+        else { v.pause(); }
+      });
+    }, { threshold: 0.1 });
+    Array.prototype.forEach.call(vids, function (v) {
+      v.muted = true; // garantit l'autoplay
+      v.addEventListener('playing', function () { v.classList.add('is-playing'); });
+      v.addEventListener('error', function () { v.style.display = 'none'; });
+      v.src = 'assets/video/' + v.getAttribute('data-video') + '.mp4';
+      io.observe(v);
     });
   }
 
@@ -255,6 +278,7 @@
     TT.booking.init();
 
     initImages();
+    initHeroVideos();
     initReveals();
     initHeader();
     initBurger();
